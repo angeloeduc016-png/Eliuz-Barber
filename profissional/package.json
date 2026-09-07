@@ -1,0 +1,8 @@
+{
+  "name": "eliuz-barber-profissional",
+  "private": true,
+  "scripts": {},
+  "engines": {
+    "node": ">=18"
+  }
+}

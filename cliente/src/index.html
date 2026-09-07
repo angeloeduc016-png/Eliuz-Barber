@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Agendamento simples da Eliuz Barber em um widget leve e fácil de usar.">
+  <meta name="eliuz-api-base" content="">
+  <link rel="icon" href="images/favicon.ico" type="image/x-icon">
+  <title>Agendar | Eliuz Barber</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Cormorant+Garamond:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <script src="js/storage.js" defer></script>
+  <script src="js/auth.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js" defer></script>
+  <script src="js/booking.js" defer></script>
+  <script src="https://unpkg.com/lucide@latest" defer></script>
+  <script src="js/main.js" defer></script>
+</head>
+<body class="client-site booking-page">
+  <header class="site-header">
+    <div class="container nav-shell">
+      <a class="brand" href="index.html">
+        <span class="brand-mark"><img src="images/logo.png" alt="Barbearia Eliuz" class="brand-logo"></span>
+      </a>
+      <button class="header-theme" type="button" data-theme-toggle aria-label="Usar tema do dispositivo" title="Tema do dispositivo"><i data-lucide="sun-moon"></i></button>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="primary-navigation">
+        <span></span><span></span><span></span>
+      </button>
+      <nav class="site-nav" id="primary-navigation">
+        <a href="index.html" aria-current="page">Agendar</a>
+        <a href="pages/home.html">Início</a>
+        <a href="pages/produtos.html">Produtos</a>
+        <a href="pages/galeria.html">Galeria</a>
+        <a href="pages/localizacao.html">Localização</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="booking-home">
+    <section class="booking-hero section-pad">
+      <div class="container booking-home-inner">
+        <div class="section-heading reveal is-visible">
+          <span class="eyebrow">Agendamento</span>
+          <h1>Escolha seu serviço e reserve seu horário.</h1>
+          <p>Selecione uma opção para começar. O agendamento abre em um painel simples e direto.</p>
+        </div>
+        <div class="service-list-toolbar">
+          <label for="service-sort">Ordenar por<select id="service-sort">
+            <option value="default">Ordem original</option>
+            <option value="price-asc">Menor valor</option>
+            <option value="price-desc">Maior valor</option>
+            <option value="name-asc">Nome (A-Z)</option>
+            <option value="name-desc">Nome (Z-A)</option>
+          </select></label>
+        </div>
+        <div id="service-choice-grid" class="service-choice-grid" aria-label="Serviços disponíveis"></div>
+      </div>
+    </section>
+
+    <dialog id="booking-widget" class="booking-widget">
+      <form method="dialog" class="booking-widget-shell">
+        <button class="booking-widget-close" type="submit" aria-label="Fechar">×</button>
+      </form>
+      <div class="booking-widget-content">
+        <div class="booking-date-picker" aria-label="Escolha uma data">
+          <div class="booking-date-picker-heading">
+            <button type="button" class="booking-date-arrow" data-date-prev aria-label="Semana anterior">‹</button>
+            <strong id="booking-month-label"></strong>
+            <button type="button" class="booking-date-arrow" data-date-next aria-label="Próxima semana">›</button>
+          </div>
+          <div id="booking-date-strip" class="booking-date-strip"></div>
+        </div>
+        <section class="booking-card booking-card-only reveal is-visible">
+          <span class="eyebrow">Agendamento</span>
+          <h2>Escolha o serviço e o melhor horário.</h2>
+          <form id="booking-form">
+            <input id="booking-customer-id" type="hidden">
+            <input id="booking-customer-name" type="hidden">
+            <input id="booking-customer-phone" type="hidden">
+            <label>Nome para o agendamento
+              <input id="booking-name" type="text" required placeholder="Seu nome">
+            </label>
+            <label>Telefone
+              <input id="booking-phone" type="tel" required placeholder="(XX) XXXXX-XXXX">
+            </label>
+            <label>E-mail
+              <input id="booking-email" type="email" placeholder="seuemail@exemplo.com">
+            </label>
+            <label>Serviço
+              <select id="service-select" required></select>
+            </label>
+            <label class="booking-date-fallback">Data
+              <input id="booking-date" type="date" required>
+              <small id="date-help">Evite domingos e datas passadas.</small>
+            </label>
+            <label>Horário
+              <input type="hidden" id="booking-time-value">
+              <div id="booking-time-container" class="time-options" aria-live="polite"></div>
+            </label>
+            <label>Observações do agendamento
+              <textarea id="booking-notes" rows="4" placeholder="Ex.: cortar mais baixo nas laterais, evitar máquina na barba, etc."></textarea>
+            </label>
+            <button class="btn btn-primary" type="submit">Confirmar agendamento</button>
+          </form>
+        </section>
+
+      </div>
+    </dialog>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container site-footer-grid">
+      <section class="footer-panel footer-location">
+        <h2>Localização</h2>
+        <p>Rua Tomás de Mesquita, 128 - 13790051<br>Centro - São Sebastião da Grama/SP</p>
+        <a class="footer-round-link" href="https://www.google.com/maps/search/?api=1&query=Rua+Tom%C3%A1s+de+Mesquita%2C+128%2C+Centro%2C+S%C3%A3o+Sebasti%C3%A3o+da+Grama%2C+SP" target="_blank" rel="noreferrer" aria-label="Abrir localização no mapa"><i data-lucide="navigation"></i></a>
+      </section>
+      <section class="footer-panel">
+        <h2>Horário de atendimento</h2>
+        <div class="footer-hours"><span>Segunda-Feira <b>Hoje</b></span><strong>15:00 - 20:00</strong></div>
+        <div class="footer-hours"><span>Terça-Feira</span><strong>15:00 - 20:00</strong></div>
+        <div class="footer-hours"><span>Quarta-Feira</span><strong>15:00 - 20:00</strong></div>
+        <div class="footer-hours"><span>Quinta-Feira</span><strong>15:00 - 20:00</strong></div>
+        <div class="footer-hours"><span>Sexta-Feira</span><strong>15:00 - 20:00</strong></div>
+        <div class="footer-hours"><span>Sábado</span><strong>08:00 - 20:00</strong></div>
+      </section>
+      <section class="footer-panel">
+        <h2>Formas de pagamento</h2>
+        <div class="footer-pills"><span>Dinheiro</span><span>Cartão de Crédito</span><span>Cartão de Débito</span><span>Pix</span></div>
+        <h2 class="footer-subtitle">Redes Sociais</h2>
+        <a class="footer-social-link" href="https://www.instagram.com/eliuz.01/" target="_blank" rel="noreferrer" aria-label="Instagram da Eliuz Barber"><svg class="instagram-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.5" cy="6.5" r="1"></circle></svg><span>@eliuz.01</span></a>
+      </section>
+      <section class="footer-panel footer-contact">
+        <h2>Contato</h2>
+        <a class="footer-contact-row" href="tel:+5519996442530"><span><i data-lucide="phone"></i></span><strong>(19) 99644-2530</strong><button type="button" data-copy="(19) 99644-2530" aria-label="Copiar telefone"><i data-lucide="copy"></i></button></a>
+        <a class="footer-contact-row" href="https://wa.me/5519996442530" target="_blank" rel="noreferrer"><span><i data-lucide="message-circle"></i></span><strong>(19) 99644-2530</strong><button type="button" data-copy="(19) 99644-2530" aria-label="Copiar WhatsApp"><i data-lucide="copy"></i></button></a>
+      </div>
+      </section>
+    </div>
+  </footer>
+</body>
+</html>

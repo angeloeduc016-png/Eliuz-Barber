@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="eliuz-api-base" content="">
+  <meta name="description" content="Fluxo de caixa, produtos e visão financeira da Eliuz Barber.">
+  <title>Financeiro | Eliuz Barber</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Cormorant+Garamond:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body class="admin-site">
+  <header class="site-header">
+    <div class="container nav-shell">
+      <a class="brand" href="../index.html">
+        <span class="brand-mark"><img src="../images/logo.png" alt="Eliuz Barber" class="brand-logo"></span>
+      </a>
+      <div id="admin-controls" class="admin-toolbar"></div>
+    </div>
+  </header>
+
+  <main class="section-pad">
+    <div class="container">
+      <div class="section-heading reveal is-visible">
+        <span class="eyebrow">Financeiro</span>
+        <h1>Caixa, pedidos e manutenção do catálogo.</h1>
+        <p>O barbeiro acompanha entradas, saídas, pedidos e ainda consegue ajustar produtos sem perder o contexto dos atendimentos já registrados.</p>
+      </div>
+
+      <div class="stats-grid">
+        <article class="stat-card reveal is-visible"><span class="eyebrow">Entradas</span><strong id="total-in" class="stat-value">R$ 0,00</strong><p>Agendamentos e lançamentos positivos</p></article>
+        <article class="stat-card reveal is-visible"><span class="eyebrow">Saídas</span><strong id="total-out" class="stat-value">R$ 0,00</strong><p>Despesas e compras</p></article>
+        <article class="stat-card reveal is-visible"><span class="eyebrow">Saldo</span><strong id="total-net" class="stat-value">R$ 0,00</strong><p>Resultado líquido</p></article>
+      </div>
+
+      <div class="dashboard-grid" style="margin-top:24px;">
+        <section class="finance-card reveal">
+          <span class="eyebrow">Lançamentos</span>
+          <h2>Registrar entrada ou saída.</h2>
+          <div class="toolbar" style="align-items:center; margin-bottom:16px;">
+            <select id="entry-type"><option value="expense">Saída</option><option value="income">Entrada</option></select>
+            <input id="entry-desc" placeholder="Descrição" style="flex:1;">
+            <input id="entry-amount" placeholder="Valor" style="width:160px;">
+            <button id="add-entry" class="btn btn-primary" type="button">Adicionar</button>
+          </div>
+          <div id="entries-list" class="message-list"></div>
+        </section>
+
+        <section class="finance-card reveal">
+          <span class="eyebrow">Produto</span>
+          <h2>Adicionar ou ajustar produto.</h2>
+          <form id="product-form" class="simple-form">
+            <input type="hidden" id="product-id">
+            <label>Nome
+              <input id="product-name" type="text" required placeholder="Nome do produto">
+            </label>
+            <label>Descrição curta
+              <input id="product-short" type="text" required placeholder="Descrição objetiva">
+            </label>
+            <label>Descrição completa
+              <textarea id="product-description" rows="4" placeholder="Detalhes do produto"></textarea>
+            </label>
+            <label>Valor
+              <input id="product-price" type="number" min="0" step="0.01" required placeholder="0,00">
+            </label>
+            <label>Foto
+              <input id="product-image" type="url" placeholder="URL da foto">
+            </label>
+            <label>Categoria
+              <input id="product-category" type="text" placeholder="Cabelo, barba, kit...">
+            </label>
+            <button class="btn btn-primary" type="submit">Salvar produto</button>
+          </form>
+        </section>
+      </div>
+
+      <section class="booking-card reveal" style="margin-top:24px;">
+        <span class="eyebrow">Pedidos e catálogo</span>
+        <h2>Pedidos de produto e visão rápida do estoque.</h2>
+        <div id="finance-order-list" class="order-list"></div>
+        <div id="finance-product-list" class="product-list" style="margin-top:16px;"></div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    if (!sessionStorage.getItem('ADMIN_TOKEN')) location.href = 'login.html';
+  </script>
+  <script src="../js/storage.js" defer></script>
+  <script src="../js/main.js" defer></script>
+  <script src="js/finance.js" defer></script>
+</body>
+</html>

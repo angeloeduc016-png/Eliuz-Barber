@@ -1,0 +1,13 @@
+# Local backend data
+data
+backend/data
+.env
+backend/.env
+
+# Dependencies
+node_modules/
+
+# Local databases
+*.sqlite
+*.sqlite3
+*.db

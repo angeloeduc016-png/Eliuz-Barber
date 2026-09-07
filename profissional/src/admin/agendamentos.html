@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Painel profissional da Eliuz Barber com agenda, clientes, mensagens e pedidos.">
+  <meta name="eliuz-api-base" content="">
+  <title>Painel profissional | Eliuz Barber</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Cormorant+Garamond:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body class="admin-site">
+  <header class="site-header">
+    <div class="container nav-shell">
+      <a class="brand" href="../index.html">
+        <span class="brand-mark"><img src="../images/logo.png" alt="Eliuz Barber" class="brand-logo"></span>
+      </a>
+      <div id="admin-controls" class="admin-toolbar"></div>
+    </div>
+  </header>
+
+  <main class="section-pad">
+    <div class="container">
+      <div class="section-heading reveal is-visible">
+        <span class="eyebrow">Painel profissional</span>
+        <h1>Visão única da operação.</h1>
+        <p>Agenda, clientes, mensagens, pedidos e catálogo aparecem na mesma base para o barbeiro planejar o dia com menos dúvida e responder mais rápido.</p>
+      </div>
+
+      <div class="stats-grid">
+        <article class="stat-card reveal is-visible"><span class="eyebrow">Agendamentos</span><strong id="stat-bookings" class="stat-value">0</strong><p>Horários registrados na base</p></article>
+        <article class="stat-card reveal is-visible"><span class="eyebrow">Clientes</span><strong id="stat-customers" class="stat-value">0</strong><p>Cadastros únicos</p></article>
+        <article class="stat-card reveal is-visible"><span class="eyebrow">Mensagens</span><strong id="stat-messages" class="stat-value">0</strong><p>Conversas pendentes ou respondidas</p></article>
+        <article class="stat-card reveal is-visible"><span class="eyebrow">Pedidos</span><strong id="stat-orders" class="stat-value">0</strong><p>Solicitações de produtos</p></article>
+      </div>
+
+      <div class="dashboard-grid" style="margin-top:24px;">
+        <section class="schedule-card reveal">
+          <div class="toolbar" style="justify-content:space-between;align-items:center;">
+            <div>
+              <span class="eyebrow">Agenda</span>
+              <h2>Horários confirmados</h2>
+            </div>
+            <div class="filter-row">
+              <label>De <input type="date" id="filter-start"></label>
+              <label>Até <input type="date" id="filter-end"></label>
+            </div>
+          </div>
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Cliente</th>
+                <th>Serviço</th>
+                <th>Data</th>
+                <th>Horário</th>
+                <th>Observação</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="booking-table-body"></tbody>
+          </table>
+        </section>
+
+        <aside class="booking-card reveal">
+          <span class="eyebrow">Resposta rápida</span>
+          <h2>Responder cliente.</h2>
+          <form id="reply-form" class="simple-form">
+            <label>Telefone ou thread
+              <input id="reply-thread" type="text" placeholder="Telefone do cliente">
+            </label>
+            <label>Assunto
+              <input id="reply-subject" type="text" placeholder="Retorno sobre seu horário">
+            </label>
+            <label>Mensagem
+              <textarea id="reply-message" rows="5" placeholder="Escreva sua resposta"></textarea>
+            </label>
+            <button class="btn btn-primary" type="submit">Enviar resposta</button>
+          </form>
+          <div class="hero-callout" style="margin-top:16px;">
+            <span>Quando você responde, a mensagem fica registrada na mesma conversa do cliente.</span>
+          </div>
+        </aside>
+      </div>
+
+      <div class="dashboard-grid" style="margin-top:24px;">
+        <section class="booking-card reveal">
+          <span class="eyebrow">Clientes</span>
+          <h2>Base cadastrada</h2>
+          <div id="customer-list" class="customer-list"></div>
+        </section>
+
+        <section class="booking-card reveal">
+          <span class="eyebrow">Mensagens</span>
+          <h2>Conversa com o cliente</h2>
+          <div id="message-list" class="message-list"></div>
+        </section>
+      </div>
+
+      <div class="dashboard-grid" style="margin-top:24px;">
+        <section class="booking-card reveal">
+          <span class="eyebrow">Pedidos de produto</span>
+          <h2>Solicitações enviadas pelos clientes</h2>
+          <div id="order-list" class="order-list"></div>
+        </section>
+
+        <section class="booking-card reveal">
+          <span class="eyebrow">Produtos</span>
+          <h2>Catálogo ativo</h2>
+          <div id="product-list" class="product-list"></div>
+          <a class="btn btn-secondary" href="finance.html" style="margin-top:16px;">Ir para financeiro</a>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    if (!sessionStorage.getItem('ADMIN_TOKEN')) {
+      location.href = 'login.html';
+    }
+  </script>
+  <script src="../js/storage.js" defer></script>
+  <script src="../js/main.js" defer></script>
+  <script src="js/admin.js" defer></script>
+</body>
+</html>
