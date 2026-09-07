@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Painel profissional da Eliuz Barber com agenda, clientes, mensagens e pedidos.">
   <meta name="eliuz-api-base" content="">
+  <link rel="icon" href="../images/favicon.ico" type="image/x-icon">
   <title>Painel profissional | Eliuz Barber</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,9 +15,16 @@
 <body class="admin-site">
   <header class="site-header">
     <div class="container nav-shell">
-      <a class="brand" href="../index.html">
+      <a class="brand" href="agendamentos.html">
         <span class="brand-mark"><img src="../images/logo.png" alt="Eliuz Barber" class="brand-logo"></span>
       </a>
+      <button class="header-theme" type="button" data-theme-toggle aria-label="Usar tema do dispositivo" title="Tema do dispositivo">◐</button>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="professional-navigation" aria-label="Abrir menu"><span></span><span></span><span></span></button>
+      <nav class="site-nav professional-nav" id="professional-navigation">
+        <a aria-current="page" href="agendamentos.html">Agenda</a>
+        <a href="clientes.html">Clientes</a>
+        <a href="finance.html">Financeiro</a>
+      </nav>
       <div id="admin-controls" class="admin-toolbar"></div>
     </div>
   </header>
@@ -25,20 +33,19 @@
     <div class="container">
       <div class="section-heading reveal is-visible">
         <span class="eyebrow">Painel profissional</span>
-        <h1>Visão única da operação.</h1>
-        <p>Agenda, clientes, mensagens, pedidos e catálogo aparecem na mesma base para o barbeiro planejar o dia com menos dúvida e responder mais rápido.</p>
+        <h1>O dia começa aqui.</h1>
+        <p>Uma visão objetiva dos horários confirmados e dos retornos que precisam de atenção.</p>
       </div>
 
       <div class="stats-grid">
         <article class="stat-card reveal is-visible"><span class="eyebrow">Agendamentos</span><strong id="stat-bookings" class="stat-value">0</strong><p>Horários registrados na base</p></article>
         <article class="stat-card reveal is-visible"><span class="eyebrow">Clientes</span><strong id="stat-customers" class="stat-value">0</strong><p>Cadastros únicos</p></article>
         <article class="stat-card reveal is-visible"><span class="eyebrow">Mensagens</span><strong id="stat-messages" class="stat-value">0</strong><p>Conversas pendentes ou respondidas</p></article>
-        <article class="stat-card reveal is-visible"><span class="eyebrow">Pedidos</span><strong id="stat-orders" class="stat-value">0</strong><p>Solicitações de produtos</p></article>
       </div>
 
-      <div class="dashboard-grid" style="margin-top:24px;">
+      <div class="dashboard-grid admin-main-grid">
         <section class="schedule-card reveal">
-          <div class="toolbar" style="justify-content:space-between;align-items:center;">
+          <div class="toolbar toolbar-between">
             <div>
               <span class="eyebrow">Agenda</span>
               <h2>Horários confirmados</h2>
@@ -84,44 +91,20 @@
         </aside>
       </div>
 
-      <div class="dashboard-grid" style="margin-top:24px;">
-        <section class="booking-card reveal">
-          <span class="eyebrow">Clientes</span>
-          <h2>Base cadastrada</h2>
-          <div id="customer-list" class="customer-list"></div>
-        </section>
-
-        <section class="booking-card reveal">
-          <span class="eyebrow">Mensagens</span>
-          <h2>Conversa com o cliente</h2>
-          <div id="message-list" class="message-list"></div>
-        </section>
-      </div>
-
-      <div class="dashboard-grid" style="margin-top:24px;">
-        <section class="booking-card reveal">
-          <span class="eyebrow">Pedidos de produto</span>
-          <h2>Solicitações enviadas pelos clientes</h2>
-          <div id="order-list" class="order-list"></div>
-        </section>
-
-        <section class="booking-card reveal">
-          <span class="eyebrow">Produtos</span>
-          <h2>Catálogo ativo</h2>
-          <div id="product-list" class="product-list"></div>
-          <a class="btn btn-secondary" href="finance.html" style="margin-top:16px;">Ir para financeiro</a>
-        </section>
-      </div>
+      <section class="quick-links reveal">
+        <a class="quick-link" href="clientes.html"><span class="quick-link-icon">01</span><span><strong>Base de clientes</strong><small>Consultar cadastros e histórico</small></span><span aria-hidden="true">→</span></a>
+        <a class="quick-link" href="finance.html"><span class="quick-link-icon">02</span><span><strong>Financeiro</strong><small>Caixa, pedidos e catálogo</small></span><span aria-hidden="true">→</span></a>
+      </section>
     </div>
   </main>
 
   <script>
     if (!sessionStorage.getItem('ADMIN_TOKEN')) {
-      location.href = 'login.html';
+      location.href = '../login.html';
     }
   </script>
   <script src="../js/storage.js" defer></script>
   <script src="../js/main.js" defer></script>
-  <script src="js/admin.js" defer></script>
+  <script src="../js/admin.js" defer></script>
 </body>
 </html>

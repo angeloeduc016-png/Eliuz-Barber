@@ -34,7 +34,7 @@ window.EliuzStorage = (() => {
       return 'http://localhost:3000/api';
     }
 
-    return '/api';
+    return 'https://eliuz-barber.vercel.app/backend';
   }
 
   function buildApiUrl(path) {

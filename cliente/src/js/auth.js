@@ -74,7 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
         <div class="account-providers" aria-label="Opções de acesso social">
           <button type="button" class="provider-button" data-provider="Google"><strong class="provider-icon google">G</strong> Google</button>
-          <button type="button" class="provider-button" data-provider="Facebook"><strong class="provider-icon facebook">f</strong> Facebook</button>
+          <!-- <button type="button" class="provider-button" data-provider="Facebook"><strong class="provider-icon facebook">f</strong> Facebook</button> -->
         </div>
         <div class="account-divider"><span>ou continue com seus dados</span></div>
         <div class="account-tabs" role="tablist">

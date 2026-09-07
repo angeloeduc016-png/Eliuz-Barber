@@ -16,13 +16,6 @@ const providers = {
     tokenEndpoint: 'https://graph.facebook.com/v21.0/oauth/access_token',
     scopes: 'public_profile,email',
   },
-  apple: {
-    clientId: process.env.APPLE_CLIENT_ID,
-    clientSecret: process.env.APPLE_CLIENT_SECRET,
-    authorizationEndpoint: 'https://appleid.apple.com/auth/authorize',
-    tokenEndpoint: 'https://appleid.apple.com/auth/token',
-    scopes: 'name email',
-  },
 };
 
 function randomToken() {
@@ -42,7 +35,9 @@ function allowedAppOrigins() {
 }
 
 function redirectUri(provider) {
-  return `${publicBackendUrl()}/api/auth/${provider}/callback`;
+  const base = publicBackendUrl();
+  const apiPrefix = base.endsWith('/backend') ? '' : '/api';
+  return `${base}${apiPrefix}/auth/${provider}/callback`;
 }
 
 function isConfigured(provider) {

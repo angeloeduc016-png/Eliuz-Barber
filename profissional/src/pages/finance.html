@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="eliuz-api-base" content="">
   <meta name="description" content="Fluxo de caixa, produtos e visão financeira da Eliuz Barber.">
+  <link rel="icon" href="../images/favicon.ico" type="image/x-icon">
   <title>Financeiro | Eliuz Barber</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,9 +15,16 @@
 <body class="admin-site">
   <header class="site-header">
     <div class="container nav-shell">
-      <a class="brand" href="../index.html">
+      <a class="brand" href="agendamentos.html">
         <span class="brand-mark"><img src="../images/logo.png" alt="Eliuz Barber" class="brand-logo"></span>
       </a>
+      <button class="header-theme" type="button" data-theme-toggle aria-label="Usar tema do dispositivo" title="Tema do dispositivo">◐</button>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="professional-navigation" aria-label="Abrir menu"><span></span><span></span><span></span></button>
+      <nav class="site-nav professional-nav" id="professional-navigation">
+        <a href="agendamentos.html">Agenda</a>
+        <a href="clientes.html">Clientes</a>
+        <a aria-current="page" href="finance.html">Financeiro</a>
+      </nav>
       <div id="admin-controls" class="admin-toolbar"></div>
     </div>
   </header>
@@ -86,10 +94,10 @@
   </main>
 
   <script>
-    if (!sessionStorage.getItem('ADMIN_TOKEN')) location.href = 'login.html';
+    if (!sessionStorage.getItem('ADMIN_TOKEN')) location.href = '../login.html';
   </script>
   <script src="../js/storage.js" defer></script>
   <script src="../js/main.js" defer></script>
-  <script src="js/finance.js" defer></script>
+  <script src="../js/finance.js" defer></script>
 </body>
 </html>

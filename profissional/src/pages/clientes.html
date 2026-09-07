@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Base de clientes da Eliuz Barber.">
+  <meta name="eliuz-api-base" content="">
+  <link rel="icon" href="../images/favicon.ico" type="image/x-icon">
+  <title>Clientes | Eliuz Barber</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Cormorant+Garamond:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body class="admin-site">
+  <header class="site-header">
+    <div class="container nav-shell">
+      <a class="brand" href="agendamentos.html"><span class="brand-mark"><img src="../images/logo.png" alt="Eliuz Barber" class="brand-logo"></span></a>
+      <button class="header-theme" type="button" data-theme-toggle aria-label="Usar tema do dispositivo" title="Tema do dispositivo">◐</button>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="professional-navigation" aria-label="Abrir menu"><span></span><span></span><span></span></button>
+      <nav class="site-nav professional-nav" id="professional-navigation">
+        <a href="agendamentos.html">Agenda</a>
+        <a aria-current="page" href="clientes.html">Clientes</a>
+        <a href="finance.html">Financeiro</a>
+      </nav>
+      <div id="admin-controls" class="admin-toolbar"></div>
+    </div>
+  </header>
+
+  <main class="section-pad">
+    <div class="container">
+      <div class="section-heading reveal is-visible">
+        <span class="eyebrow">Relacionamento</span>
+        <h1>Clientes bem acompanhados.</h1>
+        <p>Uma base separada para encontrar rapidamente quem já passou pela Eliuz Barber e entender o contexto de cada atendimento.</p>
+      </div>
+
+      <div class="stats-grid client-stats">
+        <article class="stat-card reveal is-visible"><span class="eyebrow">Cadastros</span><strong id="customer-total" class="stat-value">0</strong><p>Pessoas na sua base</p></article>
+        <article class="stat-card reveal is-visible"><span class="eyebrow">Com contato</span><strong id="customer-contactable" class="stat-value">0</strong><p>Telefone ou e-mail disponíveis</p></article>
+        <article class="stat-card reveal is-visible"><span class="eyebrow">Atendidos</span><strong id="customer-active" class="stat-value">0</strong><p>Clientes com agendamento</p></article>
+      </div>
+
+      <section class="customer-workspace reveal">
+        <div class="customer-toolbar">
+          <div>
+            <span class="eyebrow">Base cadastrada</span>
+            <h2>Encontre um cliente</h2>
+          </div>
+          <label class="search-field">
+            <span class="sr-only">Buscar cliente</span>
+            <input id="customer-search" type="search" placeholder="Nome, telefone ou e-mail" autocomplete="off">
+          </label>
+        </div>
+        <div class="customer-layout">
+          <div id="customer-list" class="customer-directory" aria-live="polite"></div>
+          <aside id="customer-detail" class="customer-detail" aria-live="polite">
+            <div class="empty-state"><span class="eyebrow">Detalhes</span><h3>Selecione um cliente</h3><p>O histórico e os dados de contato aparecerão aqui.</p></div>
+          </aside>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    if (!sessionStorage.getItem('ADMIN_TOKEN')) location.href = '../login.html';
+  </script>
+  <script src="../js/storage.js" defer></script>
+  <script src="../js/main.js" defer></script>
+  <script src="../js/clientes.js" defer></script>
+</body>
+</html>

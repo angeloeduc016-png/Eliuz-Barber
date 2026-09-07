@@ -24,6 +24,7 @@ app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: false, limit: '1mb' }));
 app.use(cookieParser());
 app.get('/', (request, response) => response.json({ ok: true, service: 'eliuz-barber-backend' }));
+app.get('/health', (request, response) => response.json({ ok: true, service: 'eliuz-barber-backend' }));
 app.use('/api', apiRoutes);
 app.use((error, request, response, next) => {
   if (error.message === 'Origem não permitida pelo CORS.') {

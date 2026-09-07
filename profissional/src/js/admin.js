@@ -15,7 +15,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const statBookings = document.getElementById('stat-bookings');
   const statCustomers = document.getElementById('stat-customers');
   const statMessages = document.getElementById('stat-messages');
-  const statOrders = document.getElementById('stat-orders');
 
   function formatBRL(value) {
     return Number(value || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -40,7 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
       button.textContent = 'Sair';
       button.addEventListener('click', () => {
         sessionStorage.removeItem('ADMIN_TOKEN');
-        location.href = 'login.html';
+        location.href = '../login.html';
       });
       adminControls.appendChild(status);
       adminControls.appendChild(button);
@@ -49,21 +48,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const loginLink = document.createElement('a');
     loginLink.className = 'btn btn-secondary';
-    loginLink.href = 'login.html';
+    loginLink.href = '../login.html';
     loginLink.textContent = 'Login';
     adminControls.appendChild(loginLink);
   }
 
   async function loadData() {
-    const [bookings, customers, messages, orders, products] = await Promise.all([
+    const [bookings, customers, messages] = await Promise.all([
       storage.getBookings({ scope: 'admin', token }),
       storage.getCustomers({ scope: 'admin', token }),
       storage.getMessages({ scope: 'admin', token }),
-      storage.getOrders({ scope: 'admin', token }),
-      storage.getProducts({ token }),
     ]);
 
-    return { bookings, customers, messages, orders, products };
+    return { bookings, customers, messages };
   }
 
   function renderBookings(bookings) {
@@ -213,18 +210,14 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   async function render() {
-    const { bookings, customers, messages, orders, products } = await loadData();
+    const { bookings, customers, messages } = await loadData();
 
     statBookings.textContent = String(bookings.length);
     statCustomers.textContent = String(customers.length);
     statMessages.textContent = String(messages.length);
-    statOrders.textContent = String(orders.length);
-
     renderBookings(bookings);
     renderCustomers(customers);
     renderMessages(messages);
-    renderOrders(orders);
-    renderProducts(products);
   }
 
   replyForm?.addEventListener('submit', async (event) => {

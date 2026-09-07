@@ -24,6 +24,7 @@ const sequelize = new Sequelize(config.db.database, config.db.user, config.db.pa
   dialect: 'mysql',
   logging: config.db.logging ? console.log : false,
   timezone: '+00:00',
+  ...(config.db.ssl ? { dialectOptions: { ssl: { rejectUnauthorized: false } } } : {}),
   define: { underscored: true, timestamps: true },
   pool: { max: 10, min: 0, acquire: 30000, idle: 10000 },
 });

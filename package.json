@@ -5,5 +5,16 @@
     "start:backend": "npm --prefix backend start",
     "dev:backend": "npm --prefix backend run dev"
   },
-  "license": "UNLICENSED"
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "mysql2": "^3.19.1",
+    "sequelize": "^6.37.8"
+  }
 }

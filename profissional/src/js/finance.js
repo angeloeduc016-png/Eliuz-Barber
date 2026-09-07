@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
       button.textContent = 'Sair';
       button.addEventListener('click', () => {
         sessionStorage.removeItem('ADMIN_TOKEN');
-        location.href = 'login.html';
+        location.href = '../login.html';
       });
       adminControls.appendChild(span);
       adminControls.appendChild(button);

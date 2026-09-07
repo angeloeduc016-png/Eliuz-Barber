@@ -30,7 +30,9 @@ Inicie o backend em um processo separado:
 npm run start:backend
 ```
 
-Por padrão, a API estará em `http://localhost:3000/api`. Para hospedar o backend em outro domínio, configure `API_BASE_URL` nos metadados do frontend ou altere o endereço padrão em `storage.js`.
+Por padrão, a API local estará em `http://localhost:3000/api`. Em produção na Vercel, o frontend usa `https://eliuz-barber.vercel.app/backend` como base pública. O endpoint de saúde fica em `https://eliuz-barber.vercel.app/backend/health`.
+
+O arquivo [vercel.json](vercel.json) encaminha `/backend/*` para a função serverless [api/[...path].js](api/[...path].js), que carrega o Express do backend. A Vercel deve ser configurada com a raiz deste repositório e com as variáveis de ambiente do banco.
 
 O frontend é servido diretamente a partir das pastas `cliente/src` e `profissional/src`. Não há etapa de build nem pastas de saída `dist`.
 
@@ -59,6 +61,30 @@ Apple:    https://SEU_BACKEND/api/auth/apple/callback
 ```
 
 Para frontend e backend em domínios diferentes, defina `APP_PUBLIC_URL`, `BACKEND_PUBLIC_URL`, `COOKIE_SAMESITE=None` e sirva ambos com HTTPS. O Google exige um OAuth Client ID e secret no Google Cloud; o Facebook exige um App ID e App Secret no Meta for Developers; a Apple exige um Services ID, Team ID, Key ID e private key no Apple Developer.
+
+Na Vercel, use pelo menos estas variáveis para a API publicada:
+
+```text
+APP_PUBLIC_URL=https://SEU_FRONTEND
+BACKEND_PUBLIC_URL=https://eliuz-barber.vercel.app/backend
+CORS_ORIGINS=https://SEU_FRONTEND
+DB_HOST=...
+DB_PORT=3306
+DB_USER=...
+DB_PASSWORD=...
+DB_NAME=eliuz_barber
+DB_CREATE_IF_MISSING=false
+COOKIE_SAMESITE=None
+```
+
+Para hospedar o MySQL, uma opção simples é criar um banco MySQL gerenciado no Railway ou no Aiven. Copie a URL de conexão fornecida pelo serviço para a variável `DATABASE_URL` na Vercel e defina `DB_SSL=true` quando o provedor exigir SSL. Não use `DB_HOST=127.0.0.1` em produção, pois isso aponta para a própria máquina da função e não para o banco hospedado.
+
+Depois de configurar o banco, faça um redeploy na Vercel e teste:
+
+```text
+https://eliuz-barber.vercel.app/backend/health
+https://eliuz-barber.vercel.app/backend/auth/providers
+```
 
 Documentação oficial:
 

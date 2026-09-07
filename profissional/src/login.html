@@ -5,11 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Área profissional da Eliuz Barber para agenda, clientes, mensagens e pedidos.">
   <meta name="eliuz-api-base" content="">
+  <link rel="icon" href="images/favicon.ico" type="image/x-icon">
   <title>Área profissional | Eliuz Barber</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Cormorant+Garamond:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="css/styles.css">
   <style>
     body.admin-login {
       min-height: 100vh;
@@ -30,7 +31,7 @@
       padding: 30px;
       border-radius: 28px;
       border: 1px solid var(--border);
-      background: linear-gradient(180deg, rgba(255, 248, 236, 0.09), rgba(255, 248, 236, 0.04));
+      background: linear-gradient(180deg, rgba(10, 18, 28, 0.94), rgba(9, 15, 24, 0.92));
       box-shadow: var(--shadow);
       backdrop-filter: blur(20px);
     }
@@ -61,7 +62,8 @@
     }
   </style>
 </head>
-<body class="admin-login">
+<body class="admin-site admin-login">
+  <button class="header-theme login-theme-toggle" type="button" data-theme-toggle aria-label="Usar tema do dispositivo" title="Tema do dispositivo">◐</button>
   <div class="login-panel">
     <section class="login-hero reveal is-visible">
       <span class="eyebrow">Painel profissional</span>
@@ -97,6 +99,10 @@
       const metaApiBase = document.querySelector('meta[name="eliuz-api-base"]')?.content?.trim();
       if (metaApiBase) {
         return metaApiBase.replace(/\/$/, '');
+      }
+
+      if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+        return 'https://eliuz-barber.vercel.app/backend';
       }
 
       return '';
@@ -137,5 +143,6 @@
       }
     });
   </script>
+  <script src="js/main.js" defer></script>
 </body>
 </html>
