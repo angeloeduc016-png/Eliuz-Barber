@@ -1,6 +1,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const request = require('node:http');
+const { spawnSync } = require('node:child_process');
 
 const apiModule = require('../backend/src/controllers/apiController');
 const vercelHandler = require('../api/[...path].js');
@@ -42,4 +43,43 @@ test('rotas explícitas de autenticação reutilizam o handler da API', () => {
   ];
 
   endpoints.forEach((endpoint) => assert.equal(endpoint, vercelHandler));
+});
+
+test('handler responde 503 e permite nova tentativa quando o banco está indisponível', () => {
+  const script = `
+    const http = require('node:http');
+    const handler = require('./vercelHandler');
+    const server = http.createServer((req, res) => handler(req, res));
+    server.listen(0, '127.0.0.1', async () => {
+      const results = [];
+      for (let attempt = 0; attempt < 2; attempt += 1) {
+        results.push(await new Promise((resolve, reject) => {
+          http.get({ hostname: '127.0.0.1', port: server.address().port, path: '/backend/auth/customer/register' }, (res) => {
+            let body = '';
+            res.on('data', (chunk) => { body += chunk; });
+            res.on('end', () => resolve({ status: res.statusCode, body: JSON.parse(body) }));
+          }).on('error', reject);
+        }));
+      }
+      console.log(JSON.stringify(results));
+      server.close();
+    });
+  `;
+  const env = {
+    ...process.env,
+    NODE_ENV: 'production',
+    VERCEL: '1',
+    ENV_FILE: 'missing-database-test-env',
+    DB_HOST: '127.0.0.1',
+    DB_PORT: '1',
+    DB_CREATE_IF_MISSING: 'false',
+    NO_COLOR: '1',
+    FORCE_COLOR: '0',
+  };
+  const result = spawnSync(process.execPath, ['-e', script], { cwd: process.cwd(), env, encoding: 'utf8' });
+
+  assert.equal(result.status, 0, result.stderr);
+  const responses = JSON.parse(result.stdout.trim());
+  assert.deepEqual(responses.map(({ status }) => status), [503, 503]);
+  assert.match(responses[0].body.message, /banco de dados na Vercel/);
 });

@@ -36,13 +36,15 @@ function databaseConfig() {
   };
 }
 
+const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL === '1';
+
 module.exports = {
   port: Number(process.env.PORT || 3000),
   host: process.env.HOST || '0.0.0.0',
   dataDir: path.resolve(process.env.DATA_DIR || path.join(process.cwd(), 'data')),
   db: {
     ...databaseConfig(),
-    createDatabase: process.env.DB_CREATE_IF_MISSING !== 'false',
+    createDatabase: process.env.DB_CREATE_IF_MISSING === 'true' || (!isProduction && process.env.DB_CREATE_IF_MISSING !== 'false'),
     syncAlter: process.env.DB_SYNC_ALTER === 'true',
     logging: process.env.DB_LOGGING === 'true',
     ssl: process.env.DB_SSL === 'true',

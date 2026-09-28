@@ -10,7 +10,7 @@ npm start
 
 Por padrão, o servidor escuta em `http://localhost:3000`. A API fica em `/api`.
 
-O banco é criado automaticamente quando `DB_CREATE_IF_MISSING=true` e as tabelas são sincronizadas na inicialização. Em produção, prefira migrations e mantenha `DB_SYNC_ALTER=false`.
+Em desenvolvimento local, o banco é criado automaticamente por padrão; use `DB_CREATE_IF_MISSING=false` para desativar esse comportamento. Na Vercel, a criação automática fica desativada por padrão: configure `DB_CREATE_IF_MISSING=false` e informe as credenciais do banco MySQL gerenciado. Em produção, mantenha `DB_SYNC_ALTER=false`.
 
 ## Configuração
 
