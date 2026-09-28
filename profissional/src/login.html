@@ -131,7 +131,7 @@
         }
 
         sessionStorage.setItem('ADMIN_TOKEN', payload.token);
-        location.href = 'agendamentos.html';
+        location.href = 'pages/agendamentos.html';
       } catch (error) {
         if (login !== '41967582000167' || pass !== 'Eliuz96430670') {
           alert(error.message || 'Credenciais inválidas');
@@ -139,7 +139,7 @@
         }
 
         sessionStorage.setItem('ADMIN_TOKEN', 'eliuz-local-token');
-        location.href = 'agendamentos.html';
+          location.href = 'pages/agendamentos.html';
       }
     });
   </script>

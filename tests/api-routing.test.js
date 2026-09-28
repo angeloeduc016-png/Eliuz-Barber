@@ -70,6 +70,8 @@ test('handler responde 503 e permite nova tentativa quando o banco está indispo
     NODE_ENV: 'production',
     VERCEL: '1',
     ENV_FILE: 'missing-database-test-env',
+    DATABASE_URL: '',
+    DB_URL: '',
     DB_HOST: '127.0.0.1',
     DB_PORT: '1',
     DB_CREATE_IF_MISSING: 'false',

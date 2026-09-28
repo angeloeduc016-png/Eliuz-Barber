@@ -2438,3 +2438,377 @@ html[data-theme="light"] body.admin-site .quick-link, html[data-theme="light"] b
   .detail-history li { grid-template-columns: 70px 1fr; }
   .detail-history li small { grid-column: 2; }
 }
+
+body.admin-site {
+  --brand-blue: #10263d;
+  --bg: #0a111b;
+  --bg-alt: #101a27;
+  --surface: #111c29;
+  --surface-2: #182637;
+  --text: #f3f6fa;
+  --muted: #a5b2c1;
+  --accent: #54a5f7;
+  --accent-2: #9bceff;
+  --border: rgba(195, 215, 238, 0.13);
+  --shadow: 0 16px 38px rgba(0, 0, 0, 0.2);
+  --radius: 12px;
+  background: linear-gradient(180deg, #0a111b 0%, #0d1723 100%);
+}
+
+body.admin-site .site-header {
+  border-bottom-color: rgba(195, 215, 238, 0.1);
+  background: rgba(8, 15, 24, 0.94);
+}
+
+body.admin-site .brand-mark {
+  border-color: var(--border);
+  border-radius: 8px;
+  background: #08111b;
+}
+
+body.admin-site .professional-nav a {
+  letter-spacing: 0;
+  text-transform: none;
+  font-size: 0.84rem;
+}
+
+body.admin-site .professional-nav a:hover,
+body.admin-site .professional-nav a[aria-current="page"] {
+  color: var(--text);
+  background: rgba(84, 165, 247, 0.11);
+  border-color: rgba(84, 165, 247, 0.24);
+}
+
+body.admin-site .section-pad {
+  padding: 48px 0 72px;
+}
+
+body.admin-site .section-heading {
+  max-width: 840px;
+  margin-bottom: 26px;
+}
+
+body.admin-site .section-heading h1 {
+  margin: 0 0 10px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 2.45rem;
+  font-weight: 700;
+  line-height: 1.12;
+}
+
+body.admin-site .section-heading p {
+  max-width: 66ch;
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.94rem;
+}
+
+body.admin-site .eyebrow,
+body.admin-site .card-label {
+  margin-bottom: 9px;
+  color: var(--accent-2);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+
+body.admin-site .eyebrow::before,
+body.admin-site .card-label::before {
+  width: 18px;
+  background: var(--accent);
+}
+
+body.admin-site .stats-grid {
+  gap: 14px;
+}
+
+body.admin-site .stat-card,
+body.admin-site .schedule-card,
+body.admin-site .finance-card,
+body.admin-site .booking-card,
+body.admin-site .customer-workspace {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: linear-gradient(160deg, rgba(22, 35, 50, 0.98), rgba(15, 25, 37, 0.98));
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.14);
+  backdrop-filter: none;
+}
+
+body.admin-site .stat-card {
+  padding: 18px 20px;
+}
+
+body.admin-site .stat-value {
+  color: var(--text);
+  font-size: 2rem;
+  line-height: 1.1;
+}
+
+body.admin-site .stat-card p {
+  margin: 7px 0 0;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+body.admin-site .schedule-card,
+body.admin-site .finance-card,
+body.admin-site .booking-card {
+  padding: 20px;
+}
+
+body.admin-site .schedule-card h2,
+body.admin-site .finance-card h2,
+body.admin-site .booking-card h2,
+body.admin-site .customer-toolbar h2 {
+  color: var(--text);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 650;
+  line-height: 1.35;
+}
+
+body.admin-site .admin-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.84rem;
+}
+
+body.admin-site .admin-table th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+body.admin-site .admin-table td {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  border-bottom-color: rgba(195, 215, 238, 0.09);
+}
+
+body.admin-site input,
+body.admin-site select,
+body.admin-site textarea {
+  min-height: 42px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: rgba(5, 12, 20, 0.5);
+  color: var(--text);
+  font-size: 0.86rem;
+}
+
+body.admin-site input:focus,
+body.admin-site select:focus,
+body.admin-site textarea:focus {
+  border-color: var(--accent);
+  outline: 2px solid rgba(84, 165, 247, 0.15);
+  outline-offset: 1px;
+}
+
+body.admin-site label {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+body.admin-site .btn,
+body.admin-site .btn-primary,
+body.admin-site .btn-secondary,
+body.admin-site .btn-ghost {
+  min-height: 40px;
+  border-radius: 7px;
+  font-size: 0.82rem;
+  font-weight: 650;
+  letter-spacing: 0;
+}
+
+body.admin-site .btn-primary {
+  background: var(--accent);
+  color: #07182b;
+}
+
+body.admin-site .quick-links {
+  gap: 12px;
+  margin-top: 18px;
+}
+
+body.admin-site .quick-link {
+  border-color: var(--border);
+  border-radius: 9px;
+  background: rgba(18, 30, 44, 0.8);
+}
+
+body.admin-site .quick-link:hover {
+  border-color: rgba(84, 165, 247, 0.4);
+}
+
+body.admin-site .quick-link-icon,
+body.admin-site .avatar {
+  border-radius: 8px;
+  background: rgba(84, 165, 247, 0.14);
+  color: var(--accent-2);
+}
+
+body.admin-site .customer-workspace {
+  padding: 20px;
+}
+
+body.admin-site .customer-directory-item {
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.025);
+}
+
+body.admin-site .customer-directory-item:hover,
+body.admin-site .customer-directory-item.is-selected {
+  border-color: rgba(84, 165, 247, 0.35);
+  background: rgba(84, 165, 247, 0.08);
+}
+
+body.admin-site .customer-detail {
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+body.admin-site.admin-login {
+  min-height: 100vh;
+  padding: 32px 20px;
+  background:
+    radial-gradient(ellipse at 18% 14%, rgba(84, 165, 247, 0.11), transparent 34%),
+    linear-gradient(145deg, #0a111b, #101b29 68%, #0c1520);
+}
+
+body.admin-login .login-panel {
+  width: min(960px, 100%);
+  grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.72fr);
+  align-items: stretch;
+  gap: 18px;
+}
+
+body.admin-login .login-hero,
+body.admin-login .login-card {
+  padding: 30px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: rgba(15, 25, 37, 0.92);
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.2);
+  backdrop-filter: none;
+}
+
+body.admin-login .login-hero {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+body.admin-login .login-hero h1 {
+  max-width: 12ch;
+  margin: 0 0 14px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 2.4rem;
+  font-weight: 700;
+  line-height: 1.16;
+}
+
+body.admin-login .login-hero p {
+  max-width: 52ch;
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+body.admin-login .login-card h2 {
+  margin: 0 0 22px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1.55rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+body.admin-login .login-card label {
+  display: grid;
+  gap: 7px;
+  margin-bottom: 16px;
+}
+
+body.admin-login .login-card input {
+  width: 100%;
+  min-height: 46px;
+}
+
+body.admin-login .login-actions .btn {
+  width: 100%;
+  margin-top: 4px;
+}
+
+html[data-theme="light"] body.admin-site {
+  --bg: #f2f6fa;
+  --bg-alt: #eaf0f6;
+  --surface: #fff;
+  --surface-2: #edf3f9;
+  --text: #182b3e;
+  --muted: #64778a;
+  --border: rgba(29, 55, 82, 0.14);
+  background: linear-gradient(180deg, #f5f8fb, #eaf0f6);
+}
+
+html[data-theme="light"] body.admin-site .site-header {
+  background: rgba(255, 255, 255, 0.94);
+}
+
+html[data-theme="light"] body.admin-site .stat-card,
+html[data-theme="light"] body.admin-site .schedule-card,
+html[data-theme="light"] body.admin-site .finance-card,
+html[data-theme="light"] body.admin-site .booking-card,
+html[data-theme="light"] body.admin-site .customer-workspace,
+html[data-theme="light"] body.admin-login .login-hero,
+html[data-theme="light"] body.admin-login .login-card {
+  background: rgba(255, 255, 255, 0.95);
+}
+
+html[data-theme="light"] body.admin-site input,
+html[data-theme="light"] body.admin-site select,
+html[data-theme="light"] body.admin-site textarea {
+  background: #f8fafc;
+  color: var(--text);
+}
+
+@media (max-width: 760px) {
+  body.admin-site .section-pad {
+    padding: 34px 0 52px;
+  }
+
+  body.admin-site .section-heading h1 {
+    font-size: 1.9rem;
+  }
+
+  body.admin-site .schedule-card,
+  body.admin-site .finance-card,
+  body.admin-site .booking-card {
+    padding: 16px;
+  }
+
+  body.admin-site .admin-table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  body.admin-login .login-panel {
+    grid-template-columns: 1fr;
+    max-width: 480px;
+  }
+
+  body.admin-login .login-hero,
+  body.admin-login .login-card {
+    padding: 22px;
+  }
+
+  body.admin-login .login-hero h1 {
+    max-width: none;
+    font-size: 1.8rem;
+  }
+}
