@@ -31,3 +31,15 @@ test('handler Vercel normaliza /backend para a rota de saúde da API', async () 
   assert.equal(response.statusCode, 200);
   assert.deepEqual(JSON.parse(response.body), { ok: true });
 });
+
+test('rotas explícitas de autenticação reutilizam o handler da API', () => {
+  const endpoints = [
+    require('../api/auth/providers'),
+    require('../api/auth/session'),
+    require('../api/auth/logout'),
+    require('../api/auth/customer/register'),
+    require('../api/auth/customer/login'),
+  ];
+
+  endpoints.forEach((endpoint) => assert.equal(endpoint, vercelHandler));
+});
