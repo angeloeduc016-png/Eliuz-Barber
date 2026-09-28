@@ -24,6 +24,7 @@ function databaseConfig() {
       user: decodeURIComponent(parsed.username),
       password: decodeURIComponent(parsed.password),
       database: parsed.pathname.replace(/^\//, ''),
+      ssl: ['REQUIRED', 'VERIFY_CA', 'VERIFY_IDENTITY'].includes(parsed.searchParams.get('ssl-mode')?.toUpperCase()),
     };
   }
 
@@ -33,21 +34,23 @@ function databaseConfig() {
     user: process.env.DB_USER || 'root',
     password: process.env.DB_PASSWORD || '',
     database: process.env.DB_NAME || 'eliuz_barber',
+    ssl: false,
   };
 }
 
 const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL === '1';
+const db = databaseConfig();
 
 module.exports = {
   port: Number(process.env.PORT || 3000),
   host: process.env.HOST || '0.0.0.0',
   dataDir: path.resolve(process.env.DATA_DIR || path.join(process.cwd(), 'data')),
   db: {
-    ...databaseConfig(),
+    ...db,
     createDatabase: process.env.DB_CREATE_IF_MISSING === 'true' || (!isProduction && process.env.DB_CREATE_IF_MISSING !== 'false'),
     syncAlter: process.env.DB_SYNC_ALTER === 'true',
     logging: process.env.DB_LOGGING === 'true',
-    ssl: process.env.DB_SSL === 'true',
+    ssl: process.env.DB_SSL === 'true' || db.ssl,
   },
   corsOrigins: (process.env.CORS_ORIGINS || '').split(',').map((origin) => origin.trim()).filter(Boolean),
 };

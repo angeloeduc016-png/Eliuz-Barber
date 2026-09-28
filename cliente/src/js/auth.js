@@ -72,11 +72,6 @@ document.addEventListener('DOMContentLoaded', () => {
           <h2 id="account-title">Acesse sua conta</h2>
           <p id="account-subtitle">Entre para agendar seu horário com seus dados protegidos.</p>
         </div>
-        <div class="account-providers" aria-label="Opções de acesso social">
-          <button type="button" class="provider-button" data-provider="Google"><strong class="provider-icon google">G</strong> Google</button>
-          <!-- <button type="button" class="provider-button" data-provider="Facebook"><strong class="provider-icon facebook">f</strong> Facebook</button> -->
-        </div>
-        <div class="account-divider"><span>ou continue com seus dados</span></div>
         <div class="account-tabs" role="tablist">
           <button type="button" class="account-tab is-active" data-account-mode="login">Entrar</button>
           <button type="button" class="account-tab" data-account-mode="register">Criar conta</button>
@@ -105,28 +100,9 @@ document.addEventListener('DOMContentLoaded', () => {
     dialog.querySelectorAll('[data-account-mode]').forEach((tab) => {
       tab.addEventListener('click', () => setMode(tab.dataset.accountMode));
     });
-    dialog.querySelectorAll('[data-provider]').forEach((button) => {
-      button.addEventListener('click', () => startProviderLogin(button.dataset.provider.toLowerCase()));
-    });
     dialog.querySelector('#account-login-form').addEventListener('submit', handleLogin);
     dialog.querySelector('#account-register-form').addEventListener('submit', handleRegister);
     updateAccountButton();
-  }
-
-  async function startProviderLogin(provider) {
-    setFeedback('Conectando com o provedor...');
-    try {
-      const response = await fetch(`${getApiBase()}/auth/providers`, { credentials: 'include' });
-      const payload = await response.json();
-      if (!payload.providers?.[provider]) {
-        throw new Error(`O login com ${provider} ainda não foi configurado no backend.`);
-      }
-      const startUrl = new URL(`${getApiBase()}/auth/${provider}/start`, window.location.href);
-      startUrl.searchParams.set('return_to', window.location.href);
-      window.location.assign(startUrl.toString());
-    } catch (error) {
-      setFeedback(error.message || 'Não foi possível iniciar o login.', true);
-    }
   }
 
   function updateAccountButton() {
