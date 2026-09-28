@@ -26,62 +26,58 @@ const DEFAULT_ADMIN_LOGIN = process.env.ADMIN_LOGIN || '41967582000167';
 const DEFAULT_ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'Eliuz96430670';
 const DEFAULT_ADMIN_TOKEN = process.env.ADMIN_BEARER_TOKEN || 'eliuz-local-token';
 const DEFAULT_PRODUCTS = [
-  {
-    id: 'pomada-modeladora',
-    name: 'Pomada Modeladora Matte',
-    shortDescription: 'Fixação média com acabamento seco para penteados do dia a dia.',
-    description: 'Controla o volume e mantém o visual alinhado sem deixar brilho excessivo.',
-    price: 39.9,
-    imageUrl: 'https://images.unsplash.com/photo-1521498542256-5c0f8a3f2f61?auto=format&fit=crop&w=900&q=80',
-    category: 'Cabelo',
-    stock: 'Pronta entrega',
-    featured: true,
-  },
-  {
-    id: 'oleo-barba',
-    name: 'Óleo para Barba',
-    shortDescription: 'Hidrata, perfuma e reduz o frizz da barba com uso diário.',
-    description: 'Ideal para quem quer brilho leve, cheiro agradável e toque macio na barba.',
-    price: 34.9,
-    imageUrl: 'https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&w=900&q=80',
-    category: 'Barba',
-    stock: 'Pronta entrega',
-    featured: true,
-  },
-  {
-    id: 'shampoo-3-em-1',
-    name: 'Shampoo 3 em 1',
-    shortDescription: 'Limpeza prática para cabelo, barba e corpo.',
-    description: 'Ajuda a manter a rotina rápida sem abrir mão de uma boa sensação de limpeza.',
-    price: 29.9,
-    imageUrl: 'https://images.unsplash.com/photo-1556228578-0d85b1a4a32c?auto=format&fit=crop&w=900&q=80',
-    category: 'Cuidados',
-    stock: 'Pronta entrega',
-    featured: false,
-  },
-  {
-    id: 'balm-pos-barba',
-    name: 'Balm Pós-Barba',
-    shortDescription: 'Alivia a pele após o barbear e evita irritações.',
-    description: 'Conforto imediato para quem busca uma finalização mais suave no rosto.',
-    price: 27.9,
-    imageUrl: 'https://images.unsplash.com/photo-1614094082869-cd4e4b7b3f22?auto=format&fit=crop&w=900&q=80',
-    category: 'Barba',
-    stock: 'Pronta entrega',
-    featured: false,
-  },
-  {
-    id: 'kit-presente',
-    name: 'Kit Presente Barber',
-    shortDescription: 'Combinação pronta para quem quer presentear com estilo.',
-    description: 'Kit selecionado com itens de uso diário para manter a aparência em dia.',
-    price: 89.9,
-    imageUrl: 'https://images.unsplash.com/photo-1514320291840-2e0a9f1f1a8f?auto=format&fit=crop&w=900&q=80',
-    category: 'Kit',
-    stock: 'Sob consulta',
-    featured: true,
-  },
-];
+  ['ampola-minoxidil', 'Ampola minoxidil', 15, 'ampola_minoxidil.PNG', 'Tratamento'],
+  ['balm', 'Balm', 25, 'balm.PNG', 'Barba'],
+  ['elixir-estimulante-capilar', 'Elixir estimulante capilar', 45, 'elixir.PNG', 'Cabelo'],
+  ['gel-fixador', 'Gel fixador', 25, 'gel_fixador.PNG', 'Cabelo'],
+  ['grooming', 'Grooming', 25, 'grooming.PNG', 'Cabelo'],
+  ['leave-in', 'Leave-in', 25, 'leave-in.PNG', 'Cabelo'],
+  ['oleo-barba', 'Óleo barba', 30, 'oleo_barba.PNG', 'Barba'],
+  ['pomada-black', 'Pomada black', 25, 'pomada_black.PNG', 'Cabelo'],
+  ['pomada-caramelo-brilho', 'Pomada caramelo brilho', 20, 'pomada_caramelo.PNG', 'Cabelo'],
+  ['pomada-em-po', 'Pomada em pó', 25, 'pomada_em_po.PNG', 'Cabelo'],
+  ['pomada-matte', 'Pomada matte', 20, 'pomada_matte.PNG', 'Cabelo'],
+  ['pomada-semi-brilho', 'Pomada semi brilho', 20, 'pomada_semi_brilho.PNG', 'Cabelo'],
+  ['pomada-super-matte', 'Pomada super matte', 20, 'pomada_super_matte.PNG', 'Cabelo'],
+  ['pomada-teia', 'Pomada teia', 20, 'pomada_teia.PNG', 'Cabelo'],
+  ['pomada-teia-120g', 'Pomada teia 120g', 25, 'pomada_teia_120g.PNG', 'Cabelo'],
+  ['shampoo-fortalecimento', 'Shampoo crescimento e fortalecimento', 28, 'shampoo_fortalecimento.PNG', 'Cabelo'],
+  ['shampoo-desintoxicante', 'Shampoo desintoxicante', 28, 'shampoo_desintoxicante.PNG', 'Cabelo'],
+  ['shampoo-ice', 'Shampoo ice', 25, 'shampoo_ice.PNG', 'Cabelo'],
+  ['shaving-gel', 'Shaving gel', 20, 'shaving_gel.PNG', 'Barba'],
+].map(([id, name, price, image, category]) => ({
+  id: `catalogo-${id}`,
+  name,
+  shortDescription: `${name} disponível na Eliuz Barber.`,
+  description: `${name} disponível para compra na barbearia.`,
+  price,
+  imageUrl: `../images/produtos/${image}`,
+  category,
+  stock: 'Pronta entrega',
+  featured: false,
+}));
+
+const LEGACY_SAMPLE_PRODUCTS = new Map([
+  ['pomada-modeladora', 'Pomada Modeladora Matte'],
+  ['oleo-barba', 'Óleo para Barba'],
+  ['shampoo-3-em-1', 'Shampoo 3 em 1'],
+  ['balm-pos-barba', 'Balm Pós-Barba'],
+  ['kit-presente', 'Kit Presente Barber'],
+]);
+
+function reconcileDefaultProducts(items) {
+  const products = items.filter((item) => LEGACY_SAMPLE_PRODUCTS.get(item.id) !== item.name);
+  const names = new Set(products.map((item) => String(item.name || '').trim().toLocaleLowerCase('pt-BR')));
+
+  DEFAULT_PRODUCTS.forEach((product) => {
+    if (!products.some((item) => item.id === product.id) && !names.has(product.name.toLocaleLowerCase('pt-BR'))) {
+      products.push(normalizeProduct(product));
+      names.add(product.name.toLocaleLowerCase('pt-BR'));
+    }
+  });
+
+  return products;
+}
 
 function json(statusCode, payload, extraHeaders = {}) {
   return {
@@ -296,13 +292,11 @@ function normalizeCashEntry(input = {}) {
 
 async function listProducts(context) {
   const items = await listCollection(context, 'products');
-  if (items.length) {
-    return items;
+  const reconciled = reconcileDefaultProducts(items);
+  if (reconciled.length !== items.length || reconciled.some((product, index) => product.id !== items[index]?.id)) {
+    await writeCollection(context, 'products', reconciled);
   }
-
-  const seeded = DEFAULT_PRODUCTS.map((product) => normalizeProduct(product));
-  await writeCollection(context, 'products', seeded);
-  return seeded;
+  return reconciled;
 }
 
 async function saveProduct(context, payload) {
@@ -924,4 +918,4 @@ async function handleRequest(event, context) {
   return json(404, { ok: false, message: 'Rota não encontrada.' });
 }
 
-module.exports = { getRoute, handleRequest };
+module.exports = { getRoute, handleRequest, reconcileDefaultProducts };

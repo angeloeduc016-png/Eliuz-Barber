@@ -5,12 +5,26 @@ const { spawnSync } = require('node:child_process');
 
 const apiModule = require('../backend/src/controllers/apiController');
 const vercelHandler = require('../api/[...path].js');
-const { getRoute } = apiModule;
+const { getRoute, reconcileDefaultProducts } = apiModule;
 
 test('getRoute normalizes API prefixes', () => {
   assert.equal(getRoute('/bookings'), 'bookings');
   assert.equal(getRoute('/api/bookings'), 'bookings');
   assert.equal(getRoute('/api/auth/login'), 'auth/login');
+});
+
+test('reconcilia o catálogo público preservando produtos personalizados', () => {
+  const products = reconcileDefaultProducts([
+    { id: 'pomada-modeladora', name: 'Pomada Modeladora Matte' },
+    { id: 'produto-personalizado', name: 'Produto personalizado', price: 31 },
+    { id: 'kit-presente', name: 'Kit ajustado pelo profissional', price: 95 },
+  ]);
+
+  assert.equal(products.length, 21);
+  assert.equal(products.some((product) => product.id === 'pomada-modeladora'), false);
+  assert.equal(products.find((product) => product.id === 'produto-personalizado')?.price, 31);
+  assert.equal(products.find((product) => product.id === 'kit-presente')?.name, 'Kit ajustado pelo profissional');
+  assert.ok(products.some((product) => product.name === 'Ampola minoxidil' && product.imageUrl.endsWith('/ampola_minoxidil.PNG')));
 });
 
 test('handler Vercel normaliza /backend para a rota de saúde da API', async () => {

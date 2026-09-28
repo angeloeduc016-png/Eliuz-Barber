@@ -1,30 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
+  const storage = window.EliuzStorage;
   const productGrid = document.getElementById('product-list');
   const searchInput = document.getElementById('product-search');
   const sortButtons = document.querySelectorAll('[data-product-sort]');
-
-  const products = [
-    ['Ampola minoxidil', 15, 'ampola_minoxidil.PNG'],
-    ['Balm', 25, 'balm.PNG'],
-    ['Elixir estimulante capilar', 45, 'elixir.PNG'],
-    ['Gel fixador', 25, 'gel_fixador.PNG'],
-    ['Grooming', 25, 'grooming.PNG'],
-    ['Leave-in', 25, 'leave-in.PNG'],
-    ['Óleo barba', 30, 'oleo_barba.PNG'],
-    ['Pomada black', 25, 'pomada_black.PNG'],
-    ['Pomada caramelo brilho', 20, 'pomada_caramelo.PNG'],
-    ['Pomada em pó', 25, 'pomada_em_po.PNG'],
-    ['Pomada matte', 20, 'pomada_matte.PNG'],
-    ['Pomada semi brilho', 20, 'pomada_semi_brilho.PNG'],
-    ['Pomada super matte', 20, 'pomada_super_matte.PNG'],
-    ['Pomada teia', 20, 'pomada_teia.PNG'],
-    ['Pomada teia 120g', 25, 'pomada_teia_120g.PNG'],
-    ['Shampoo crescimento e fortalecimento', 28, 'shampoo_fortalecimento.PNG'],
-    ['Shampoo desintoxicante', 28, 'shampoo_desintoxicante.PNG'],
-    ['Shampoo ice', 25, 'shampoo_ice.PNG'],
-    ['Shaving gel', 20, 'shaving_gel.PNG'],
-  ].map(([name, price, image]) => ({ name, price, image }));
-
+  let products = [];
   let sortMode = 'name';
 
   function formatBRL(value) {
@@ -34,10 +13,13 @@ document.addEventListener('DOMContentLoaded', () => {
   function renderProducts() {
     const searchTerm = (searchInput?.value || '').trim().toLocaleLowerCase('pt-BR');
     const filteredProducts = products
-      .filter((product) => product.name.toLocaleLowerCase('pt-BR').includes(searchTerm))
+      .filter((product) => product.ativo !== false)
+      .filter((product) => `${product.name || product.nome || ''} ${product.category || product.categoria || ''}`.toLocaleLowerCase('pt-BR').includes(searchTerm))
       .sort((first, second) => {
-        if (sortMode === 'price') return first.price - second.price || first.name.localeCompare(second.name);
-        return first.name.localeCompare(second.name);
+        const firstName = first.name || first.nome || '';
+        const secondName = second.name || second.nome || '';
+        if (sortMode === 'price') return Number(first.price ?? first.valor ?? 0) - Number(second.price ?? second.valor ?? 0) || firstName.localeCompare(secondName, 'pt-BR');
+        return firstName.localeCompare(secondName, 'pt-BR');
       });
 
     productGrid.innerHTML = '';
@@ -50,17 +32,50 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     filteredProducts.forEach((product) => {
+      const name = product.name || product.nome || 'Produto';
+      const imageUrl = product.imageUrl || product.foto || product.image || '../images/social.jpg';
       const card = document.createElement('article');
       card.className = 'product-list-card reveal is-visible';
-      card.innerHTML = `
-        <img src="${product.image ? `../images/produtos/${product.image}` : '../images/social.jpg'}" alt="${product.name}">
-        <div class="product-list-card-copy">
-          <h2>${product.name}</h2>
-          <strong>${formatBRL(product.price)}</strong>
-        </div>
-      `;
+      const image = document.createElement('img');
+      image.src = imageUrl;
+      image.alt = name;
+      image.loading = 'lazy';
+      image.addEventListener('error', () => {
+        image.src = '../images/social.jpg';
+      }, { once: true });
+
+      const copy = document.createElement('div');
+      copy.className = 'product-list-card-copy';
+      const title = document.createElement('h2');
+      title.textContent = name;
+      const description = document.createElement('p');
+      description.textContent = product.shortDescription || product.description || '';
+      const price = document.createElement('strong');
+      price.textContent = formatBRL(product.price ?? product.valor ?? 0);
+
+      copy.append(title, description, price);
+      card.append(image, copy);
       productGrid.appendChild(card);
     });
+  }
+
+  function renderMessage(message) {
+    productGrid.innerHTML = '';
+    const state = document.createElement('p');
+    state.className = 'product-list-empty';
+    state.textContent = message;
+    productGrid.appendChild(state);
+  }
+
+  async function loadProducts() {
+    renderMessage('Carregando produtos...');
+    try {
+      if (!storage?.getProducts) throw new Error('Catálogo indisponível.');
+      products = await storage.getProducts();
+      renderProducts();
+    } catch (error) {
+      renderMessage('Não foi possível carregar os produtos. Tente novamente mais tarde.');
+    }
   }
 
   searchInput?.addEventListener('input', renderProducts);
@@ -72,5 +87,5 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  renderProducts();
+  loadProducts();
 });
