@@ -1,4 +1,5 @@
 const mysql = require('mysql2/promise');
+const mysql2 = require('mysql2');
 const { Sequelize } = require('sequelize');
 const config = require('../config/env');
 
@@ -22,6 +23,7 @@ const sequelize = new Sequelize(config.db.database, config.db.user, config.db.pa
   host: config.db.host,
   port: config.db.port,
   dialect: 'mysql',
+  dialectModule: mysql2,
   logging: config.db.logging ? console.log : false,
   timezone: '+00:00',
   ...(config.db.ssl ? { dialectOptions: { ssl: { rejectUnauthorized: false } } } : {}),
