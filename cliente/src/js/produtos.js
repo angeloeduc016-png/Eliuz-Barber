@@ -37,6 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const descriptionText = (product.shortDescription || product.description || '')
         .replace(/\s*disponível na Eliuz Barber\.?/gi, '')
         .trim();
+      const hasDistinctDescription = descriptionText && descriptionText.toLocaleLowerCase('pt-BR') !== name.toLocaleLowerCase('pt-BR');
       const card = document.createElement('article');
       card.className = 'product-list-card reveal is-visible';
       const image = document.createElement('img');
@@ -55,7 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
       price.textContent = formatBRL(product.price ?? product.valor ?? 0);
 
       copy.append(title);
-      if (descriptionText) {
+      if (hasDistinctDescription) {
         const description = document.createElement('p');
         description.textContent = descriptionText;
         copy.append(description);
