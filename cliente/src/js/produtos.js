@@ -34,6 +34,9 @@ document.addEventListener('DOMContentLoaded', () => {
     filteredProducts.forEach((product) => {
       const name = product.name || product.nome || 'Produto';
       const imageUrl = product.imageUrl || product.foto || product.image || '../images/social.jpg';
+      const descriptionText = (product.shortDescription || product.description || '')
+        .replace(/\s*disponível na Eliuz Barber\.?/gi, '')
+        .trim();
       const card = document.createElement('article');
       card.className = 'product-list-card reveal is-visible';
       const image = document.createElement('img');
@@ -48,12 +51,16 @@ document.addEventListener('DOMContentLoaded', () => {
       copy.className = 'product-list-card-copy';
       const title = document.createElement('h2');
       title.textContent = name;
-      const description = document.createElement('p');
-      description.textContent = product.shortDescription || product.description || '';
       const price = document.createElement('strong');
       price.textContent = formatBRL(product.price ?? product.valor ?? 0);
 
-      copy.append(title, description, price);
+      copy.append(title);
+      if (descriptionText) {
+        const description = document.createElement('p');
+        description.textContent = descriptionText;
+        copy.append(description);
+      }
+      copy.append(price);
       card.append(image, copy);
       productGrid.appendChild(card);
     });
