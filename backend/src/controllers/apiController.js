@@ -782,6 +782,24 @@ async function handleRequest(event, context) {
     return json(201, { ok: true, product: result });
   }
 
+  if (route === 'products' && method === 'DELETE') {
+    if (!isAuthorized(event)) {
+      return json(401, { ok: false, message: 'Não autorizado.' });
+    }
+
+    const body = await readBody(event);
+    const productId = String(body.id || event.queryStringParameters?.id || '').trim();
+    if (!productId) return json(400, { ok: false, message: 'Informe o produto que deseja excluir.' });
+
+    const products = await listProducts(context);
+    const index = products.findIndex((item) => item.id === productId);
+    if (index < 0) return json(404, { ok: false, message: 'Produto não encontrado.' });
+
+    products[index] = { ...products[index], ativo: false, updatedAt: new Date().toISOString() };
+    await writeCollection(context, 'products', products);
+    return json(200, { ok: true });
+  }
+
   if (route === 'gallery' && method === 'GET') {
     return json(200, { ok: true, items: await listGallery(context) });
   }
@@ -794,6 +812,24 @@ async function handleRequest(event, context) {
     const result = await saveGalleryItem(context, await readBody(event));
     if (result.error) return json(400, { ok: false, message: result.error });
     return json(201, { ok: true, item: result });
+  }
+
+  if (route === 'gallery' && method === 'DELETE') {
+    if (!isAuthorized(event)) {
+      return json(401, { ok: false, message: 'Não autorizado.' });
+    }
+
+    const body = await readBody(event);
+    const itemId = String(body.id || event.queryStringParameters?.id || '').trim();
+    if (!itemId) return json(400, { ok: false, message: 'Informe a imagem que deseja excluir.' });
+
+    const items = await listGallery(context);
+    const index = items.findIndex((item) => item.id === itemId);
+    if (index < 0) return json(404, { ok: false, message: 'Imagem não encontrada.' });
+
+    items[index] = { ...items[index], ativo: false, updatedAt: new Date().toISOString() };
+    await writeCollection(context, 'gallery', items);
+    return json(200, { ok: true });
   }
 
   if (route === 'customers' && method === 'GET') {

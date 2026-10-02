@@ -19,6 +19,22 @@ test('getRoute normalizes API prefixes', () => {
   assert.equal(getRoute('/api/auth/login'), 'auth/login');
 });
 
+test('roteia mutações de produtos e galeria pelas rotas-base', async () => {
+  for (const route of ['products', 'gallery']) {
+    for (const method of ['POST', 'DELETE']) {
+      const response = await apiModule.handleRequest({
+        path: `/${route}`,
+        httpMethod: method,
+        headers: {},
+        body: JSON.stringify({ id: 'probe-id' }),
+      }, {});
+
+      assert.equal(response.statusCode, 401, `${method} /${route} deve chegar à verificação de autenticação`);
+      assert.equal(JSON.parse(response.body).message, 'Não autorizado.');
+    }
+  }
+});
+
 test('reconcilia o catálogo público preservando produtos personalizados', () => {
   const products = reconcileDefaultProducts([
     { id: 'pomada-modeladora', name: 'Pomada Modeladora Matte' },

@@ -248,11 +248,10 @@ window.EliuzStorage = (() => {
 
   async function saveProduct(product, options = {}) {
     const token = options.token || sessionStorage.getItem('ADMIN_TOKEN') || '';
-    const isUpdate = Boolean(product.id);
     return request(
-      isUpdate ? `/api/products/${encodeURIComponent(product.id)}` : '/api/products',
+      '/api/products',
       {
-        method: isUpdate ? 'PATCH' : 'POST',
+        method: 'POST',
         headers: token ? { Authorization: `Bearer ${token}` } : {},
         body: JSON.stringify(product),
       },
@@ -273,10 +272,11 @@ window.EliuzStorage = (() => {
   async function deleteProduct(id, options = {}) {
     const token = options.token || sessionStorage.getItem('ADMIN_TOKEN') || '';
     return request(
-      `/api/products/${encodeURIComponent(id)}`,
+      '/api/products',
       {
         method: 'DELETE',
         headers: token ? { Authorization: `Bearer ${token}` } : {},
+        body: JSON.stringify({ id }),
       },
       () => {
         write('ELIUZ_PRODUCTS', getLocalProducts().filter((item) => item.id !== id));
@@ -294,11 +294,10 @@ window.EliuzStorage = (() => {
 
   async function saveGalleryItem(item, options = {}) {
     const token = options.token || sessionStorage.getItem('ADMIN_TOKEN') || '';
-    const isUpdate = Boolean(item.id);
     return request(
-      isUpdate ? `/api/gallery/${encodeURIComponent(item.id)}` : '/api/gallery',
+      '/api/gallery',
       {
-        method: isUpdate ? 'PATCH' : 'POST',
+        method: 'POST',
         headers: token ? { Authorization: `Bearer ${token}` } : {},
         body: JSON.stringify(item),
       },
@@ -316,10 +315,11 @@ window.EliuzStorage = (() => {
   async function deleteGalleryItem(id, options = {}) {
     const token = options.token || sessionStorage.getItem('ADMIN_TOKEN') || '';
     return request(
-      `/api/gallery/${encodeURIComponent(id)}`,
+      '/api/gallery',
       {
         method: 'DELETE',
         headers: token ? { Authorization: `Bearer ${token}` } : {},
+        body: JSON.stringify({ id }),
       },
       () => {
         write('ELIUZ_GALLERY', getLocalGallery().filter((item) => item.id !== id));
