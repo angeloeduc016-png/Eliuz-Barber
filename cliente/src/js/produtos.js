@@ -54,6 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
       title.textContent = name;
       const price = document.createElement('strong');
       price.textContent = formatBRL(product.price ?? product.valor ?? 0);
+      const quantity = product.quantity ?? (typeof product.stock === 'number' ? product.stock : null);
 
       copy.append(title);
       if (hasDistinctDescription) {
@@ -62,6 +63,11 @@ document.addEventListener('DOMContentLoaded', () => {
         copy.append(description);
       }
       copy.append(price);
+      if (quantity !== null) {
+        const availability = document.createElement('p');
+        availability.textContent = quantity > 0 ? `${quantity} disponíveis` : 'Indisponível';
+        copy.append(availability);
+      }
       card.append(image, copy);
       productGrid.appendChild(card);
     });

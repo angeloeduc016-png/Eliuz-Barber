@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="eliuz-api-base" content="">
+  <meta name="description" content="Gerencie as imagens exibidas na galeria da Eliuz Barber.">
+  <link rel="icon" href="../images/favicon.ico" type="image/x-icon">
+  <title>Galeria | Eliuz Barber</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Cormorant+Garamond:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body class="admin-site">
+  <header class="site-header">
+    <div class="container nav-shell">
+      <a class="brand" href="agendamentos.html"><span class="brand-mark"><img src="../images/logo.png" alt="Eliuz Barber" class="brand-logo"></span></a>
+      <button class="header-theme" type="button" data-theme-toggle aria-label="Usar tema do dispositivo" title="Tema do dispositivo">◐</button>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="professional-navigation" aria-label="Abrir menu"><span></span><span></span><span></span></button>
+      <nav class="site-nav professional-nav" id="professional-navigation">
+        <a href="agendamentos.html">Agenda</a>
+        <a href="clientes.html">Clientes</a>
+        <a href="finance.html">Financeiro</a>
+        <a aria-current="page" href="galeria.html">Galeria</a>
+      </nav>
+      <div id="admin-controls" class="admin-toolbar"></div>
+    </div>
+  </header>
+
+  <main class="section-pad">
+    <div class="container">
+      <div class="section-heading reveal is-visible">
+        <span class="eyebrow">Portfólio</span>
+        <h1>Imagens da galeria.</h1>
+      </div>
+
+      <div class="dashboard-grid">
+        <section class="finance-card reveal is-visible">
+          <h2 id="gallery-form-heading">Adicionar imagem.</h2>
+          <form id="gallery-form" class="simple-form">
+            <input id="gallery-id" type="hidden">
+            <label>Título
+              <input id="gallery-title" type="text" required placeholder="Ex.: Degradê">
+            </label>
+            <label>Categoria
+              <input id="gallery-label" type="text" placeholder="Corte, barba...">
+            </label>
+            <label>Texto alternativo
+              <input id="gallery-alt" type="text" required placeholder="Descreva a imagem">
+            </label>
+            <label>URL da imagem
+              <input id="gallery-image" type="url" required placeholder="https://...">
+            </label>
+            <label class="gallery-featured-control">
+              <input id="gallery-featured" type="checkbox">
+              <span>Destacar na galeria</span>
+            </label>
+            <div class="toolbar">
+              <button class="btn btn-primary" type="submit">Salvar imagem</button>
+              <button id="gallery-clear" class="btn btn-secondary" type="button">Nova imagem</button>
+            </div>
+            <p id="gallery-feedback" aria-live="polite"></p>
+          </form>
+        </section>
+
+        <section class="booking-card reveal is-visible">
+          <span class="eyebrow">Publicadas</span>
+          <h2>Imagens da galeria</h2>
+          <div id="gallery-admin-list" class="product-list" aria-live="polite"></div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    if (!sessionStorage.getItem('ADMIN_TOKEN')) location.href = '../login.html';
+  </script>
+  <script src="../js/storage.js" defer></script>
+  <script src="../js/main.js" defer></script>
+  <script src="../js/galeria.js" defer></script>
+</body>
+</html>

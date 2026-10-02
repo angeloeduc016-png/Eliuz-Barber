@@ -24,6 +24,7 @@
         <a href="agendamentos.html">Agenda</a>
         <a href="clientes.html">Clientes</a>
         <a aria-current="page" href="finance.html">Financeiro</a>
+        <a href="galeria.html">Galeria</a>
       </nav>
       <div id="admin-controls" class="admin-toolbar"></div>
     </div>
@@ -74,12 +75,18 @@
               <input id="product-price" type="number" min="0" step="0.01" required placeholder="0,00">
             </label>
             <label>Foto
-              <input id="product-image" type="url" placeholder="URL da foto">
+              <input id="product-image" type="url" placeholder="URL da imagem">
+            </label>
+            <label>Quantidade disponível
+              <input id="product-quantity" type="number" min="0" step="1" required placeholder="0">
             </label>
             <label>Categoria
               <input id="product-category" type="text" placeholder="Cabelo, barba, kit...">
             </label>
-            <button class="btn btn-primary" type="submit">Salvar produto</button>
+            <div class="toolbar">
+              <button class="btn btn-primary" type="submit">Salvar produto</button>
+              <button id="product-clear" class="btn btn-secondary" type="button">Novo produto</button>
+            </div>
           </form>
         </section>
       </div>

@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const productPrice = document.getElementById('product-price');
   const productImage = document.getElementById('product-image');
   const productCategory = document.getElementById('product-category');
+  const productQuantity = document.getElementById('product-quantity');
 
   function formatBRL(value) {
     return Number(value || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -108,13 +109,14 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     productList.innerHTML = '';
-    products.forEach((product) => {
+    products.filter((product) => product.ativo !== false).forEach((product) => {
       const item = document.createElement('div');
       item.className = 'product-item';
       item.innerHTML = `
         <div>
           <strong>${product.name || ''}</strong>
           <p>${product.shortDescription || ''}</p>
+          <p>Quantidade: ${product.quantity ?? (typeof product.stock === 'number' ? product.stock : 'não informada')}</p>
         </div>
         <div>${formatBRL(product.price || product.valor || 0)}</div>
       `;
@@ -130,8 +132,23 @@ document.addEventListener('DOMContentLoaded', () => {
         productPrice.value = String(Number(product.price || 0));
         productImage.value = product.imageUrl || '';
         productCategory.value = product.category || '';
+        productQuantity.value = String(product.quantity ?? (typeof product.stock === 'number' ? product.stock : ''));
       });
       item.appendChild(editButton);
+      const deleteButton = document.createElement('button');
+      deleteButton.className = 'btn btn-secondary';
+      deleteButton.type = 'button';
+      deleteButton.textContent = 'Excluir';
+      deleteButton.addEventListener('click', async () => {
+        if (!confirm(`Excluir ${product.name || 'este produto'} do catálogo?`)) return;
+        try {
+          await storage.deleteProduct(product.id, { token });
+          await render();
+        } catch (error) {
+          alert(error.message || 'Não foi possível excluir o produto.');
+        }
+      });
+      item.appendChild(deleteButton);
       productList.appendChild(item);
     });
   }
@@ -158,8 +175,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   productForm?.addEventListener('submit', async (event) => {
     event.preventDefault();
-    if (!productName.value.trim() || !productShort.value.trim() || !productPrice.value) {
-      alert('Preencha o nome, a descrição curta e o valor.');
+    if (!productName.value.trim() || !productShort.value.trim() || !productPrice.value || productQuantity.value === '') {
+      alert('Preencha o nome, a descrição curta, o valor e a quantidade.');
       return;
     }
 
@@ -172,7 +189,8 @@ document.addEventListener('DOMContentLoaded', () => {
         price: Number(productPrice.value || 0),
         imageUrl: productImage.value.trim(),
         category: productCategory.value.trim(),
-        stock: 'Pronta entrega',
+        quantity: Number(productQuantity.value),
+        stock: Number(productQuantity.value),
         featured: true,
       }, { token });
 
@@ -183,6 +201,12 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (error) {
       alert(error.message || 'Não foi possível salvar o produto.');
     }
+  });
+
+  document.getElementById('product-clear')?.addEventListener('click', () => {
+    productForm.reset();
+    productId.value = '';
+    productName.focus();
   });
 
   updateAuthUI();

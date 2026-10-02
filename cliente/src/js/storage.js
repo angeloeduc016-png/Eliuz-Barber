@@ -1,6 +1,42 @@
 window.EliuzStorage = (() => {
   const BOOKING_KEY = 'ELIUZ_BOOKINGS';
   const CASH_KEY = 'ELIUZ_CASH_ENTRIES';
+  const DEFAULT_PRODUCTS = [
+    ['ampola-minoxidil', 'Ampola minoxidil', 15, 'ampola_minoxidil.PNG', 'Tratamento'],
+    ['balm', 'Balm', 30, 'balm.PNG', 'Barba'],
+    ['elixir-estimulante-capilar', 'Elixir estimulante capilar', 45, 'elixir.PNG', 'Cabelo'],
+    ['grooming', 'Grooming', 30, 'grooming.PNG', 'Cabelo'],
+    ['leave-in', 'Leave-in', 30, 'leave-in.PNG', 'Cabelo'],
+    ['oleo-barba', 'Óleo barba', 30, 'oleo_barba.PNG', 'Barba'],
+    ['pomada-black', 'Pomada black', 25, 'pomada_black.PNG', 'Cabelo'],
+    ['pomada-caramelo-brilho', 'Pomada caramelo brilho', 25, 'pomada_caramelo.PNG', 'Cabelo'],
+    ['pomada-em-po', 'Pomada em pó', 30, 'pomada_em_po.PNG', 'Cabelo'],
+    ['pomada-matte', 'Pomada matte', 25, 'pomada_matte.PNG', 'Cabelo'],
+    ['pomada-semi-brilho', 'Pomada semi brilho', 25, 'pomada_semi_brilho.PNG', 'Cabelo'],
+    ['pomada-super-matte', 'Pomada super matte', 25, 'pomada_super_matte.PNG', 'Cabelo'],
+    ['pomada-teia', 'Pomada teia', 25, 'pomada_teia.PNG', 'Cabelo'],
+    ['shampoo-fortalecimento', 'Shampoo crescimento e fortalecimento', 35, 'shampoo_fortalecimento.PNG', 'Cabelo'],
+    ['shampoo-desintoxicante', 'Shampoo desintoxicante', 35, 'shampoo_desintoxicante.PNG', 'Cabelo'],
+    ['shampoo-ice', 'Shampoo ice', 30, 'shampoo_ice.PNG', 'Cabelo'],
+    ['shaving-gel', 'Shaving gel', 20, 'shaving_gel.PNG', 'Barba'],
+  ].map(([id, name, price, image, category]) => ({
+    id: `catalogo-${id}`,
+    name,
+    shortDescription: `${name} disponível na Eliuz Barber.`,
+    description: `${name} disponível para compra na barbearia.`,
+    price,
+    imageUrl: `../images/produtos/${image}`,
+    category,
+    stock: 'Pronta entrega',
+    featured: false,
+  }));
+  const DEFAULT_GALLERY = [
+    { id: 'galeria-tesoura', title: 'Tesoura', label: 'Corte', altText: 'Corte masculino feito na tesoura', imageUrl: '../images/tesoura.jpg', featured: true },
+    { id: 'galeria-degrade', title: 'Degradê', label: 'Corte', altText: 'Corte masculino degradê', imageUrl: '../images/degrade.jpg' },
+    { id: 'galeria-barba', title: 'Barba', label: 'Barba', altText: 'Barba alinhada', imageUrl: '../images/barba.jpg' },
+    { id: 'galeria-taper-fade', title: 'Taper Fade', label: 'Corte', altText: 'Corte masculino Taper Fade', imageUrl: '../images/taper_fade.jpg' },
+    { id: 'galeria-social', title: 'Social', label: 'Corte', altText: 'Corte masculino social clássico', imageUrl: '../images/social.jpg' },
+  ];
   const SERVICE_CATALOG = {
     '1.0 CORTE DE CABELO': { price: 40, duration: 60, icon: 1 },
     '1.1 BARBA': { price: 40, duration: 60, icon: 2 },
@@ -105,7 +141,12 @@ window.EliuzStorage = (() => {
   }
 
   function getLocalProducts() {
-    return read('ELIUZ_PRODUCTS');
+    const products = read('ELIUZ_PRODUCTS');
+    return products.length ? products : DEFAULT_PRODUCTS;
+  }
+
+  function getLocalGallery() {
+    return localStorage.getItem('ELIUZ_GALLERY') ? read('ELIUZ_GALLERY') : DEFAULT_GALLERY;
   }
 
   async function request(path, options = {}, fallback) {
@@ -209,6 +250,17 @@ window.EliuzStorage = (() => {
         return payload.items;
       }
 
+      return Array.isArray(payload) ? payload : [];
+    });
+  }
+
+  async function getGallery() {
+    return request(
+      '/api/gallery',
+      {},
+      () => getLocalGallery()
+    ).then((payload) => {
+      if (payload && Array.isArray(payload.items)) return payload.items;
       return Array.isArray(payload) ? payload : [];
     });
   }
@@ -500,6 +552,7 @@ window.EliuzStorage = (() => {
     saveBooking,
     deleteBooking,
     getProducts,
+    getGallery,
     saveProduct,
     getCustomers,
     saveCustomer,

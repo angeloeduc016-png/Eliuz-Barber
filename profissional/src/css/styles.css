@@ -916,6 +916,56 @@ textarea:focus {
   background: rgba(255, 255, 255, 0.03);
 }
 
+.gallery-admin-item {
+  align-items: center;
+}
+
+.gallery-admin-thumb {
+  width: 64px;
+  height: 78px;
+  flex: 0 0 auto;
+  border-radius: 4px;
+  object-fit: cover;
+}
+
+.gallery-admin-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.gallery-admin-details p {
+  margin: 6px 0 0;
+}
+
+.gallery-admin-actions {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 8px;
+}
+
+.gallery-featured-control {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.gallery-featured-control input {
+  width: auto;
+  margin: 0;
+  padding: 0;
+}
+
+@media (max-width: 520px) {
+  .gallery-admin-item {
+    flex-wrap: wrap;
+  }
+
+  .gallery-admin-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
+
 .admin-table {
   width: 100%;
   border-collapse: collapse;

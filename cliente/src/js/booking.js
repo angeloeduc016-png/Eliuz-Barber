@@ -286,7 +286,7 @@ document.addEventListener('DOMContentLoaded', () => {
   async function renderProducts() {
     if (!productGrid) return;
 
-    const products = await getProducts();
+    const products = (await getProducts()).filter((product) => product.ativo !== false);
     productGrid.innerHTML = '';
 
     if (!products.length) {
@@ -298,6 +298,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     products.forEach((product) => {
+      const quantity = product.quantity ?? (typeof product.stock === 'number' ? product.stock : null);
       const card = document.createElement('article');
       card.className = 'product-card reveal is-visible';
       card.innerHTML = `
@@ -307,9 +308,9 @@ document.addEventListener('DOMContentLoaded', () => {
         <p>${product.shortDescription || product.description || ''}</p>
         <div class="hero-callout">
           <strong class="product-price">${formatBRL(product.price)}</strong>
-          <span>${product.stock || 'Sob consulta'}</span>
+          <span>${quantity === null ? product.stock || 'Sob consulta' : quantity > 0 ? `${quantity} disponíveis` : 'Indisponível'}</span>
         </div>
-        <button type="button" class="btn btn-secondary" data-product-id="${product.id}">Quero este produto</button>
+        <button type="button" class="btn btn-secondary" data-product-id="${product.id}" ${quantity === 0 ? 'disabled' : ''}>Quero este produto</button>
       `;
       card.querySelector('button').addEventListener('click', () => {
         if (orderProductId) orderProductId.value = product.id;

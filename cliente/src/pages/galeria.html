@@ -15,6 +15,7 @@
   <script src="../js/main.js" defer></script>
   <script src="../js/storage.js" defer></script>
   <script src="../js/auth.js" defer></script>
+  <script src="../js/galeria.js" defer></script>
 </head>
 <body class="client-site">
   <header class="site-header">
@@ -44,34 +45,13 @@
           <h1>Seu próximo visual começa aqui.</h1>
           <p>Referências de cortes e barba para levar ao seu próximo atendimento.</p>
         </div>
-        <div class="gallery-count" aria-label="Cinco referências">
-          <strong>05</strong>
+        <div id="gallery-count" class="gallery-count" aria-label="Carregando referências">
+          <strong id="gallery-count-number">05</strong>
           <span>referências</span>
         </div>
       </div>
 
-      <div class="portfolio-grid gallery-grid">
-        <article class="portfolio-card gallery-card gallery-card-featured reveal">
-          <img src="../images/tesoura.jpg" alt="Corte masculino feito na tesoura">
-          <div class="gallery-card-caption"><div class="gallery-card-index">01 <small>EM DESTAQUE</small></div><h2>Tesoura</h2></div>
-        </article>
-        <article class="portfolio-card gallery-card reveal">
-          <img src="../images/degrade.jpg" alt="Corte masculino degradê">
-          <div class="gallery-card-caption"><div class="gallery-card-index">02 <small>CORTE</small></div><h2>Degradê</h2></div>
-        </article>
-        <article class="portfolio-card gallery-card reveal">
-          <img src="../images/barba.jpg" alt="Barba alinhada">
-          <div class="gallery-card-caption"><div class="gallery-card-index">03 <small>BARBA</small></div><h2>Barba</h2></div>
-        </article>
-        <article class="portfolio-card gallery-card reveal">
-          <img src="../images/taper_fade.jpg" alt="Corte masculino Taper Fade">
-          <div class="gallery-card-caption"><div class="gallery-card-index">04 <small>CORTE</small></div><h2>Taper Fade</h2></div>
-        </article>
-        <article class="portfolio-card gallery-card reveal">
-          <img src="../images/social.jpg" alt="Corte masculino social clássico">
-          <div class="gallery-card-caption"><div class="gallery-card-index">05 <small>CORTE</small></div><h2>Social</h2></div>
-        </article>
-      </div>
+      <div id="gallery-grid" class="portfolio-grid gallery-grid" aria-live="polite"></div>
     </div>
   </main>
 

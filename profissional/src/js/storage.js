@@ -1,6 +1,13 @@
 window.EliuzStorage = (() => {
   const BOOKING_KEY = 'ELIUZ_BOOKINGS';
   const CASH_KEY = 'ELIUZ_CASH_ENTRIES';
+  const DEFAULT_GALLERY = [
+    { id: 'galeria-tesoura', title: 'Tesoura', label: 'Corte', altText: 'Corte masculino feito na tesoura', imageUrl: '../images/tesoura.jpg', featured: true },
+    { id: 'galeria-degrade', title: 'Degradê', label: 'Corte', altText: 'Corte masculino degradê', imageUrl: '../images/degrade.jpg' },
+    { id: 'galeria-barba', title: 'Barba', label: 'Barba', altText: 'Barba alinhada', imageUrl: '../images/barba.jpg' },
+    { id: 'galeria-taper-fade', title: 'Taper Fade', label: 'Corte', altText: 'Corte masculino Taper Fade', imageUrl: '../images/taper_fade.jpg' },
+    { id: 'galeria-social', title: 'Social', label: 'Corte', altText: 'Corte masculino social clássico', imageUrl: '../images/social.jpg' },
+  ];
   const SERVICE_CATALOG = {
     '1.0 CORTE DE CABELO': { price: 40, duration: 60 },
     '1.1 BARBA': { price: 40, duration: 60 },
@@ -106,6 +113,10 @@ window.EliuzStorage = (() => {
 
   function getLocalProducts() {
     return read('ELIUZ_PRODUCTS');
+  }
+
+  function getLocalGallery() {
+    return localStorage.getItem('ELIUZ_GALLERY') ? read('ELIUZ_GALLERY') : DEFAULT_GALLERY;
   }
 
   async function request(path, options = {}, fallback) {
@@ -237,10 +248,11 @@ window.EliuzStorage = (() => {
 
   async function saveProduct(product, options = {}) {
     const token = options.token || sessionStorage.getItem('ADMIN_TOKEN') || '';
+    const isUpdate = Boolean(product.id);
     return request(
-      '/api/products',
+      isUpdate ? `/api/products/${encodeURIComponent(product.id)}` : '/api/products',
       {
-        method: 'POST',
+        method: isUpdate ? 'PATCH' : 'POST',
         headers: token ? { Authorization: `Bearer ${token}` } : {},
         body: JSON.stringify(product),
       },
@@ -256,6 +268,64 @@ window.EliuzStorage = (() => {
         return normalized;
       }
     ).then((payload) => payload.product || payload);
+  }
+
+  async function deleteProduct(id, options = {}) {
+    const token = options.token || sessionStorage.getItem('ADMIN_TOKEN') || '';
+    return request(
+      `/api/products/${encodeURIComponent(id)}`,
+      {
+        method: 'DELETE',
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      },
+      () => {
+        write('ELIUZ_PRODUCTS', getLocalProducts().filter((item) => item.id !== id));
+        return { ok: true };
+      }
+    );
+  }
+
+  async function getGallery() {
+    return request('/api/gallery', {}, () => getLocalGallery()).then((payload) => {
+      if (payload && Array.isArray(payload.items)) return payload.items;
+      return Array.isArray(payload) ? payload : [];
+    });
+  }
+
+  async function saveGalleryItem(item, options = {}) {
+    const token = options.token || sessionStorage.getItem('ADMIN_TOKEN') || '';
+    const isUpdate = Boolean(item.id);
+    return request(
+      isUpdate ? `/api/gallery/${encodeURIComponent(item.id)}` : '/api/gallery',
+      {
+        method: isUpdate ? 'PATCH' : 'POST',
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        body: JSON.stringify(item),
+      },
+      () => {
+        const items = getLocalGallery();
+        const normalized = { ...item, id: item.id || `${Date.now()}-${Math.random().toString(36).slice(2, 8)}` };
+        const filtered = items.filter((existing) => existing.id !== normalized.id);
+        filtered.unshift(normalized);
+        write('ELIUZ_GALLERY', filtered);
+        return normalized;
+      }
+    ).then((payload) => payload.item || payload);
+  }
+
+  async function deleteGalleryItem(id, options = {}) {
+    const token = options.token || sessionStorage.getItem('ADMIN_TOKEN') || '';
+    return request(
+      `/api/gallery/${encodeURIComponent(id)}`,
+      {
+        method: 'DELETE',
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      },
+      () => {
+        write('ELIUZ_GALLERY', getLocalGallery().filter((item) => item.id !== id));
+        return { ok: true };
+      }
+    );
   }
 
   async function getCustomers(options = {}) {
@@ -533,6 +603,10 @@ window.EliuzStorage = (() => {
     deleteBooking,
     getProducts,
     saveProduct,
+    deleteProduct,
+    getGallery,
+    saveGalleryItem,
+    deleteGalleryItem,
     getCustomers,
     saveCustomer,
     getMessages,

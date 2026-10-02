@@ -27,23 +27,21 @@ const DEFAULT_ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'Eliuz96430670';
 const DEFAULT_ADMIN_TOKEN = process.env.ADMIN_BEARER_TOKEN || 'eliuz-local-token';
 const DEFAULT_PRODUCTS = [
   ['ampola-minoxidil', 'Ampola minoxidil', 15, 'ampola_minoxidil.PNG', 'Tratamento'],
-  ['balm', 'Balm', 25, 'balm.PNG', 'Barba'],
+  ['balm', 'Balm', 30, 'balm.PNG', 'Barba'],
   ['elixir-estimulante-capilar', 'Elixir estimulante capilar', 45, 'elixir.PNG', 'Cabelo'],
-  ['gel-fixador', 'Gel fixador', 25, 'gel_fixador.PNG', 'Cabelo'],
-  ['grooming', 'Grooming', 25, 'grooming.PNG', 'Cabelo'],
-  ['leave-in', 'Leave-in', 25, 'leave-in.PNG', 'Cabelo'],
+  ['grooming', 'Grooming', 30, 'grooming.PNG', 'Cabelo'],
+  ['leave-in', 'Leave-in', 30, 'leave-in.PNG', 'Cabelo'],
   ['oleo-barba', 'Óleo barba', 30, 'oleo_barba.PNG', 'Barba'],
   ['pomada-black', 'Pomada black', 25, 'pomada_black.PNG', 'Cabelo'],
-  ['pomada-caramelo-brilho', 'Pomada caramelo brilho', 20, 'pomada_caramelo.PNG', 'Cabelo'],
-  ['pomada-em-po', 'Pomada em pó', 25, 'pomada_em_po.PNG', 'Cabelo'],
-  ['pomada-matte', 'Pomada matte', 20, 'pomada_matte.PNG', 'Cabelo'],
-  ['pomada-semi-brilho', 'Pomada semi brilho', 20, 'pomada_semi_brilho.PNG', 'Cabelo'],
-  ['pomada-super-matte', 'Pomada super matte', 20, 'pomada_super_matte.PNG', 'Cabelo'],
-  ['pomada-teia', 'Pomada teia', 20, 'pomada_teia.PNG', 'Cabelo'],
-  ['pomada-teia-120g', 'Pomada teia 120g', 25, 'pomada_teia_120g.PNG', 'Cabelo'],
-  ['shampoo-fortalecimento', 'Shampoo crescimento e fortalecimento', 28, 'shampoo_fortalecimento.PNG', 'Cabelo'],
-  ['shampoo-desintoxicante', 'Shampoo desintoxicante', 28, 'shampoo_desintoxicante.PNG', 'Cabelo'],
-  ['shampoo-ice', 'Shampoo ice', 25, 'shampoo_ice.PNG', 'Cabelo'],
+  ['pomada-caramelo-brilho', 'Pomada caramelo brilho', 25, 'pomada_caramelo.PNG', 'Cabelo'],
+  ['pomada-em-po', 'Pomada em pó', 30, 'pomada_em_po.PNG', 'Cabelo'],
+  ['pomada-matte', 'Pomada matte', 25, 'pomada_matte.PNG', 'Cabelo'],
+  ['pomada-semi-brilho', 'Pomada semi brilho', 25, 'pomada_semi_brilho.PNG', 'Cabelo'],
+  ['pomada-super-matte', 'Pomada super matte', 25, 'pomada_super_matte.PNG', 'Cabelo'],
+  ['pomada-teia', 'Pomada teia', 25, 'pomada_teia.PNG', 'Cabelo'],
+  ['shampoo-fortalecimento', 'Shampoo crescimento e fortalecimento', 35, 'shampoo_fortalecimento.PNG', 'Cabelo'],
+  ['shampoo-desintoxicante', 'Shampoo desintoxicante', 35, 'shampoo_desintoxicante.PNG', 'Cabelo'],
+  ['shampoo-ice', 'Shampoo ice', 30, 'shampoo_ice.PNG', 'Cabelo'],
   ['shaving-gel', 'Shaving gel', 20, 'shaving_gel.PNG', 'Barba'],
 ].map(([id, name, price, image, category]) => ({
   id: `catalogo-${id}`,
@@ -57,6 +55,21 @@ const DEFAULT_PRODUCTS = [
   featured: false,
 }));
 
+const DEFAULT_GALLERY = [
+  ['tesoura', 'Tesoura', 'Corte', 'Corte masculino feito na tesoura', true],
+  ['degrade', 'Degradê', 'Corte', 'Corte masculino degradê', false],
+  ['barba', 'Barba', 'Barba', 'Barba alinhada', false],
+  ['taper-fade', 'Taper Fade', 'Corte', 'Corte masculino Taper Fade', false],
+  ['social', 'Social', 'Corte', 'Corte masculino social clássico', false],
+].map(([id, title, label, altText, featured]) => ({
+  id: `galeria-${id}`,
+  title,
+  label,
+  altText,
+  imageUrl: `../images/${id === 'taper-fade' ? 'taper_fade' : id}.jpg`,
+  featured,
+}));
+
 const LEGACY_SAMPLE_PRODUCTS = new Map([
   ['pomada-modeladora', 'Pomada Modeladora Matte'],
   ['oleo-barba', 'Óleo para Barba'],
@@ -65,8 +78,46 @@ const LEGACY_SAMPLE_PRODUCTS = new Map([
   ['kit-presente', 'Kit Presente Barber'],
 ]);
 
+const PREVIOUS_DEFAULT_PRICES = new Map([
+  ['catalogo-balm', 25],
+  ['catalogo-grooming', 25],
+  ['catalogo-leave-in', 25],
+  ['catalogo-pomada-caramelo-brilho', 20],
+  ['catalogo-pomada-em-po', 25],
+  ['catalogo-pomada-matte', 20],
+  ['catalogo-pomada-semi-brilho', 20],
+  ['catalogo-pomada-super-matte', 20],
+  ['catalogo-pomada-teia', 20],
+  ['catalogo-shampoo-fortalecimento', 28],
+  ['catalogo-shampoo-desintoxicante', 28],
+  ['catalogo-shampoo-ice', 25],
+]);
+
+const RETIRED_DEFAULT_PRODUCTS = new Map([
+  ['catalogo-gel-fixador', { name: 'Gel fixador', price: 25, imageUrl: '../images/produtos/gel_fixador.PNG' }],
+  ['catalogo-pomada-teia-120g', { name: 'Pomada teia 120g', price: 25, imageUrl: '../images/produtos/pomada_teia_120g.PNG' }],
+]);
+
 function reconcileDefaultProducts(items) {
-  const products = items.filter((item) => LEGACY_SAMPLE_PRODUCTS.get(item.id) !== item.name);
+  const defaultById = new Map(DEFAULT_PRODUCTS.map((product) => [product.id, product]));
+  const products = items
+    .filter((item) => LEGACY_SAMPLE_PRODUCTS.get(item.id) !== item.name)
+    .filter((item) => {
+      const retiredProduct = RETIRED_DEFAULT_PRODUCTS.get(item.id);
+      return !retiredProduct
+        || item.name !== retiredProduct.name
+        || Number(item.price ?? item.valor) !== retiredProduct.price
+        || item.imageUrl !== retiredProduct.imageUrl;
+    })
+    .map((item) => {
+      const defaultProduct = defaultById.get(item.id);
+      const previousPrice = PREVIOUS_DEFAULT_PRICES.get(item.id);
+      if (!defaultProduct || item.name !== defaultProduct.name || Number(item.price ?? item.valor) !== previousPrice) {
+        return item;
+      }
+
+      return { ...item, price: defaultProduct.price, valor: defaultProduct.price, updatedAt: new Date().toISOString() };
+    });
   const names = new Set(products.map((item) => String(item.name || '').trim().toLocaleLowerCase('pt-BR')));
 
   DEFAULT_PRODUCTS.forEach((product) => {
@@ -77,6 +128,16 @@ function reconcileDefaultProducts(items) {
   });
 
   return products;
+}
+
+function reconcileDefaultGallery(items) {
+  const gallery = [...items];
+  DEFAULT_GALLERY.forEach((entry) => {
+    if (!gallery.some((item) => item.id === entry.id)) {
+      gallery.push(normalizeGalleryItem(entry));
+    }
+  });
+  return gallery;
 }
 
 function json(statusCode, payload, extraHeaders = {}) {
@@ -218,6 +279,10 @@ function normalizeCustomer(input = {}) {
 
 function normalizeProduct(input = {}) {
   const price = Number(input.price ?? input.valor ?? 0);
+  const rawQuantity = input.quantity ?? input.quantidade ?? (typeof input.stock === 'number' ? input.stock : undefined);
+  const quantity = rawQuantity === undefined || rawQuantity === ''
+    ? undefined
+    : Math.max(0, Math.floor(Number(rawQuantity) || 0));
 
   return {
     id: input.id || `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
@@ -227,10 +292,27 @@ function normalizeProduct(input = {}) {
     price,
     imageUrl: input.imageUrl || input.foto || '',
     category: input.category || input.categoria || '',
-    stock: input.stock || input.estoque || '',
+    stock: quantity === undefined ? input.stock || input.estoque || '' : quantity,
+    quantity,
     featured: Boolean(input.featured),
     ativo: input.ativo !== false,
     valor: price,
+    createdAt: input.createdAt || new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  };
+}
+
+function normalizeGalleryItem(input = {}) {
+  const title = input.title || input.name || '';
+
+  return {
+    id: input.id || `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    title,
+    label: input.label || input.category || 'Corte',
+    altText: input.altText || input.alt || title,
+    imageUrl: input.imageUrl || input.image || '',
+    featured: Boolean(input.featured),
+    ativo: input.ativo !== false,
     createdAt: input.createdAt || new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };
@@ -293,7 +375,7 @@ function normalizeCashEntry(input = {}) {
 async function listProducts(context) {
   const items = await listCollection(context, 'products');
   const reconciled = reconcileDefaultProducts(items);
-  if (reconciled.length !== items.length || reconciled.some((product, index) => product.id !== items[index]?.id)) {
+  if (reconciled.length !== items.length || reconciled.some((product, index) => product !== items[index])) {
     await writeCollection(context, 'products', reconciled);
   }
   return reconciled;
@@ -310,6 +392,30 @@ async function saveProduct(context, payload) {
   filtered.unshift(product);
   await writeCollection(context, 'products', filtered);
   return product;
+}
+
+async function listGallery(context) {
+  const items = await listCollection(context, 'gallery');
+  const gallery = reconcileDefaultGallery(items);
+
+  if (gallery.length !== items.length || gallery.some((item, index) => item.id !== items[index]?.id)) {
+    await writeCollection(context, 'gallery', gallery);
+  }
+
+  return gallery;
+}
+
+async function saveGalleryItem(context, payload) {
+  const item = normalizeGalleryItem(payload);
+  if (!item.title || !item.imageUrl) {
+    return { error: 'Preencha o título e a URL da imagem.' };
+  }
+
+  const items = await listGallery(context);
+  const filtered = items.filter((existing) => existing.id !== item.id);
+  filtered.unshift(item);
+  await writeCollection(context, 'gallery', filtered);
+  return item;
 }
 
 async function listCustomers(context) {
@@ -676,6 +782,20 @@ async function handleRequest(event, context) {
     return json(201, { ok: true, product: result });
   }
 
+  if (route === 'gallery' && method === 'GET') {
+    return json(200, { ok: true, items: await listGallery(context) });
+  }
+
+  if (route === 'gallery' && method === 'POST') {
+    if (!isAuthorized(event)) {
+      return json(401, { ok: false, message: 'Não autorizado.' });
+    }
+
+    const result = await saveGalleryItem(context, await readBody(event));
+    if (result.error) return json(400, { ok: false, message: result.error });
+    return json(201, { ok: true, item: result });
+  }
+
   if (route === 'customers' && method === 'GET') {
     const scope = event.queryStringParameters?.scope === 'admin' ? 'admin' : 'public';
     if (scope === 'admin' && !isAuthorized(event)) {
@@ -905,6 +1025,59 @@ async function handleRequest(event, context) {
     return json(200, { ok: true, product: products[index] });
   }
 
+  if (route.startsWith('products/') && method === 'DELETE') {
+    if (!isAuthorized(event)) {
+      return json(401, { ok: false, message: 'Não autorizado.' });
+    }
+
+    const productId = route.split('/')[1];
+    const products = await listProducts(context);
+    const index = products.findIndex((item) => item.id === productId);
+    if (index < 0) {
+      return json(404, { ok: false, message: 'Produto não encontrado.' });
+    }
+
+    products[index] = { ...products[index], ativo: false, updatedAt: new Date().toISOString() };
+    await writeCollection(context, 'products', products);
+    return json(200, { ok: true });
+  }
+
+  if (route.startsWith('gallery/') && method === 'PATCH') {
+    if (!isAuthorized(event)) {
+      return json(401, { ok: false, message: 'Não autorizado.' });
+    }
+
+    const itemId = route.split('/')[1];
+    const body = await readBody(event);
+    const items = await listGallery(context);
+    const index = items.findIndex((item) => item.id === itemId);
+    if (index < 0) return json(404, { ok: false, message: 'Imagem não encontrada.' });
+
+    const updatedItem = normalizeGalleryItem({ ...items[index], ...body, id: itemId });
+    if (!updatedItem.title || !updatedItem.imageUrl) {
+      return json(400, { ok: false, message: 'Preencha o título e a URL da imagem.' });
+    }
+
+    items[index] = updatedItem;
+    await writeCollection(context, 'gallery', items);
+    return json(200, { ok: true, item: updatedItem });
+  }
+
+  if (route.startsWith('gallery/') && method === 'DELETE') {
+    if (!isAuthorized(event)) {
+      return json(401, { ok: false, message: 'Não autorizado.' });
+    }
+
+    const itemId = route.split('/')[1];
+    const items = await listGallery(context);
+    const index = items.findIndex((item) => item.id === itemId);
+    if (index < 0) return json(404, { ok: false, message: 'Imagem não encontrada.' });
+
+    items[index] = { ...items[index], ativo: false, updatedAt: new Date().toISOString() };
+    await writeCollection(context, 'gallery', items);
+    return json(200, { ok: true });
+  }
+
   if (route.startsWith('orders/') && method === 'DELETE') {
     if (!isAuthorized(event)) {
       return json(401, { ok: false, message: 'Não autorizado.' });
@@ -918,4 +1091,11 @@ async function handleRequest(event, context) {
   return json(404, { ok: false, message: 'Rota não encontrada.' });
 }
 
-module.exports = { getRoute, handleRequest, reconcileDefaultProducts };
+module.exports = {
+  getRoute,
+  handleRequest,
+  normalizeGalleryItem,
+  normalizeProduct,
+  reconcileDefaultGallery,
+  reconcileDefaultProducts,
+};
