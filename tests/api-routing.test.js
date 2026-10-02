@@ -1,6 +1,9 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const request = require('node:http');
+const fs = require('node:fs');
+const path = require('node:path');
+const vm = require('node:vm');
 const { spawnSync } = require('node:child_process');
 
 const apiModule = require('../backend/src/controllers/apiController');
@@ -32,6 +35,42 @@ test('roteia mutações de produtos e galeria pelas rotas-base', async () => {
       assert.equal(response.statusCode, 401, `${method} /${route} deve chegar à verificação de autenticação`);
       assert.equal(JSON.parse(response.body).message, 'Não autorizado.');
     }
+  }
+});
+
+test('mantém Content-Type JSON junto ao token nas mutações autenticadas', async () => {
+  for (const app of ['cliente', 'profissional']) {
+    const requests = [];
+    const context = vm.createContext({
+      window: { ELIUZ_API_BASE_URL: 'https://example.test/api' },
+      document: { querySelector: () => null },
+      localStorage: { getItem: () => null, setItem: () => {} },
+      sessionStorage: { getItem: () => '', removeItem: () => {} },
+      fetch: async (url, options) => {
+        requests.push({ url, headers: options.headers });
+        return { ok: true, json: async () => ({ product: {}, item: {} }) };
+      },
+    });
+    const storagePath = path.join(__dirname, '..', app, 'src', 'js', 'storage.js');
+    vm.runInContext(fs.readFileSync(storagePath, 'utf8'), context, { filename: storagePath });
+
+    await context.window.EliuzStorage.saveProduct({
+      name: 'Produto de teste',
+      shortDescription: 'Descrição de teste',
+      price: 20,
+    }, { token: 'test-token' });
+    if (app === 'profissional') {
+      await context.window.EliuzStorage.saveGalleryItem({
+        title: 'Imagem de teste',
+        imageUrl: 'data:image/jpeg;base64,dGVzdA==',
+      }, { token: 'test-token' });
+    }
+
+    assert.equal(requests.length, app === 'profissional' ? 2 : 1);
+    requests.forEach(({ headers }) => {
+      assert.equal(headers['Content-Type'], 'application/json');
+      assert.equal(headers.Authorization, 'Bearer test-token');
+    });
   }
 });
 

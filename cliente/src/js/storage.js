@@ -157,11 +157,11 @@ window.EliuzStorage = (() => {
 
     try {
       const response = await fetch(buildApiUrl(path), {
+        ...options,
         headers: {
           'Content-Type': 'application/json',
           ...(options.headers || {}),
         },
-        ...options,
       });
 
       const payload = await response.json().catch(() => ({}));
