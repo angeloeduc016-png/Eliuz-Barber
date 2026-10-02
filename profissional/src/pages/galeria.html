@@ -22,6 +22,7 @@
         <a href="agendamentos.html">Agenda</a>
         <a href="clientes.html">Clientes</a>
         <a href="finance.html">Financeiro</a>
+        <a href="produtos.html">Produtos</a>
         <a aria-current="page" href="galeria.html">Galeria</a>
       </nav>
       <div id="admin-controls" class="admin-toolbar"></div>
@@ -49,9 +50,12 @@
             <label>Texto alternativo
               <input id="gallery-alt" type="text" required placeholder="Descreva a imagem">
             </label>
-            <label>URL da imagem
-              <input id="gallery-image" type="url" required placeholder="https://...">
+            <label>Imagem
+              <input id="gallery-image" type="file" accept="image/*">
             </label>
+            <figure id="gallery-image-preview-wrap" class="image-upload-preview" hidden>
+              <img id="gallery-image-preview" alt="Prévia da imagem selecionada">
+            </figure>
             <label class="gallery-featured-control">
               <input id="gallery-featured" type="checkbox">
               <span>Destacar na galeria</span>
@@ -78,6 +82,7 @@
   </script>
   <script src="../js/storage.js" defer></script>
   <script src="../js/main.js" defer></script>
+  <script src="../js/image-upload.js" defer></script>
   <script src="../js/galeria.js" defer></script>
 </body>
 </html>

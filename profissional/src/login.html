@@ -11,85 +11,33 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Cormorant+Garamond:wght@600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
-  <style>
-    body.admin-login {
-      min-height: 100vh;
-      display: grid;
-      place-items: center;
-      padding: 24px;
-    }
-
-    .login-panel {
-      width: min(1080px, 100%);
-      display: grid;
-      grid-template-columns: 1.05fr 0.95fr;
-      gap: 24px;
-    }
-
-    .login-hero,
-    .login-card {
-      padding: 30px;
-      border-radius: 28px;
-      border: 1px solid var(--border);
-      background: linear-gradient(180deg, rgba(10, 18, 28, 0.94), rgba(9, 15, 24, 0.92));
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(20px);
-    }
-
-    .login-hero h1,
-    .login-card h2 {
-      font-family: 'Cormorant Garamond', serif;
-      line-height: 0.95;
-      margin: 0 0 16px;
-    }
-
-    .login-hero h1 {
-      font-size: clamp(3rem, 8vw, 5.8rem);
-    }
-
-    .login-card h2 {
-      font-size: clamp(2rem, 4vw, 3rem);
-    }
-
-    .login-actions {
-      margin-top: 10px;
-    }
-
-    @media (max-width: 860px) {
-      .login-panel {
-        grid-template-columns: 1fr;
-      }
-    }
-  </style>
 </head>
 <body class="admin-site admin-login">
   <button class="header-theme login-theme-toggle" type="button" data-theme-toggle aria-label="Usar tema do dispositivo" title="Tema do dispositivo">◐</button>
-  <div class="login-panel">
-    <section class="login-hero reveal is-visible">
-      <span class="eyebrow">Painel profissional</span>
-      <h1>Agenda, clientes, mensagens e pedidos em um único fluxo.</h1>
-      <p>O profissional trabalha com a mesma base do cliente. Isso deixa o planejamento mais previsível, reduz dúvida e ajuda a responder rápido quando alguém manda observação ou pede produto.</p>
-      <div class="hero-badges">
-        <span>API compartilhada</span>
-        <span>Clientes cadastrados</span>
-        <span>Pedidos e mensagens</span>
-      </div>
-    </section>
-
+  <main class="login-shell">
+    <div class="login-brand">
+      <img src="images/logo.png" alt="Eliuz Barber" class="brand-logo">
+      <span>ÁREA PROFISSIONAL</span>
+    </div>
     <section class="login-card reveal is-visible">
-      <span class="eyebrow">Acesso</span>
-      <h2>Entrar no painel</h2>
-      <label for="admin-login">Login
-        <input id="admin-login" type="text" autocomplete="username" placeholder="Seu login">
-      </label>
-      <label for="admin-pass">Senha
-        <input id="admin-pass" type="password" autocomplete="current-password" placeholder="Sua senha">
-      </label>
-      <div class="login-actions">
-        <button id="btn-login" class="btn btn-primary" type="button">Entrar</button>
-      </div>
+      <span class="eyebrow">Acesso seguro</span>
+      <h1>Entrar no painel</h1>
+      <p class="login-description">Use suas credenciais profissionais para continuar.</p>
+      <form id="admin-login-form">
+        <label for="admin-login">Login
+          <input id="admin-login" type="text" autocomplete="username" required placeholder="Seu login">
+        </label>
+        <label for="admin-pass">Senha
+          <input id="admin-pass" type="password" autocomplete="current-password" required placeholder="Sua senha">
+        </label>
+        <div class="login-actions">
+          <button id="btn-login" class="btn btn-primary" type="submit">Entrar</button>
+        </div>
+        <p id="login-feedback" class="login-feedback" role="status" aria-live="polite"></p>
+      </form>
     </section>
-  </div>
+    <p class="login-note">Eliuz Barber <span>·</span> Gestão profissional</p>
+  </main>
   <script>
     const getApiBase = () => {
       if (typeof window.ELIUZ_API_BASE_URL === 'string' && window.ELIUZ_API_BASE_URL.trim()) {
@@ -108,14 +56,15 @@
       return '';
     };
 
-    document.getElementById('btn-login').addEventListener('click', async () => {
+    document.getElementById('admin-login-form').addEventListener('submit', async (event) => {
+      event.preventDefault();
       const login = document.getElementById('admin-login').value.trim();
       const pass = document.getElementById('admin-pass').value.trim();
-
-      if (!login || !pass) {
-        alert('Preencha os campos.');
-        return;
-      }
+      const button = document.getElementById('btn-login');
+      const feedback = document.getElementById('login-feedback');
+      button.disabled = true;
+      feedback.textContent = '';
+      feedback.classList.remove('is-error');
 
       try {
         const apiBase = getApiBase();
@@ -133,13 +82,15 @@
         sessionStorage.setItem('ADMIN_TOKEN', payload.token);
         location.href = 'pages/agendamentos.html';
       } catch (error) {
-        if (login !== '41967582000167' || pass !== 'Eliuz96430670') {
-          alert(error.message || 'Credenciais inválidas');
+        if (login === '41967582000167' && pass === 'Eliuz96430670') {
+          sessionStorage.setItem('ADMIN_TOKEN', 'eliuz-local-token');
+          location.href = 'pages/agendamentos.html';
           return;
         }
-
-        sessionStorage.setItem('ADMIN_TOKEN', 'eliuz-local-token');
-          location.href = 'pages/agendamentos.html';
+        feedback.textContent = error.message || 'Não foi possível entrar. Confira suas credenciais.';
+        feedback.classList.add('is-error');
+      } finally {
+        button.disabled = false;
       }
     });
   </script>

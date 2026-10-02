@@ -6,30 +6,19 @@ document.addEventListener('DOMContentLoaded', () => {
   const totalNetEl = document.getElementById('total-net');
   const entriesList = document.getElementById('entries-list');
   const orderList = document.getElementById('finance-order-list');
-  const productList = document.getElementById('finance-product-list');
-  const productForm = document.getElementById('product-form');
-  const productId = document.getElementById('product-id');
-  const productName = document.getElementById('product-name');
-  const productShort = document.getElementById('product-short');
-  const productDescription = document.getElementById('product-description');
-  const productPrice = document.getElementById('product-price');
-  const productImage = document.getElementById('product-image');
-  const productCategory = document.getElementById('product-category');
-  const productQuantity = document.getElementById('product-quantity');
 
   function formatBRL(value) {
     return Number(value || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
   }
 
   async function loadData() {
-    const [bookings, cashEntries, orders, products] = await Promise.all([
+    const [bookings, cashEntries, orders] = await Promise.all([
       storage.getBookings({ scope: 'admin', token }),
       storage.getCashEntries({ token }),
       storage.getOrders({ scope: 'admin', token }),
-      storage.getProducts({ token }),
     ]);
 
-    return { bookings, cashEntries, orders, products };
+    return { bookings, cashEntries, orders };
   }
 
   function updateAuthUI() {
@@ -54,7 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   async function render() {
-    const { bookings, cashEntries, orders, products } = await loadData();
+    const { bookings, cashEntries, orders } = await loadData();
 
     const bookingIncome = bookings.reduce((sum, booking) => sum + Number(booking.value || booking.valor || 0), 0);
     const manualIncome = cashEntries.filter((entry) => entry.type === 'income').reduce((sum, entry) => sum + Number(entry.amount || 0), 0);
@@ -108,49 +97,6 @@ document.addEventListener('DOMContentLoaded', () => {
       orderList.appendChild(item);
     });
 
-    productList.innerHTML = '';
-    products.filter((product) => product.ativo !== false).forEach((product) => {
-      const item = document.createElement('div');
-      item.className = 'product-item';
-      item.innerHTML = `
-        <div>
-          <strong>${product.name || ''}</strong>
-          <p>${product.shortDescription || ''}</p>
-          <p>Quantidade: ${product.quantity ?? (typeof product.stock === 'number' ? product.stock : 'não informada')}</p>
-        </div>
-        <div>${formatBRL(product.price || product.valor || 0)}</div>
-      `;
-      const editButton = document.createElement('button');
-      editButton.className = 'btn btn-secondary';
-      editButton.type = 'button';
-      editButton.textContent = 'Editar';
-      editButton.addEventListener('click', () => {
-        productId.value = product.id || '';
-        productName.value = product.name || '';
-        productShort.value = product.shortDescription || '';
-        productDescription.value = product.description || '';
-        productPrice.value = String(Number(product.price || 0));
-        productImage.value = product.imageUrl || '';
-        productCategory.value = product.category || '';
-        productQuantity.value = String(product.quantity ?? (typeof product.stock === 'number' ? product.stock : ''));
-      });
-      item.appendChild(editButton);
-      const deleteButton = document.createElement('button');
-      deleteButton.className = 'btn btn-secondary';
-      deleteButton.type = 'button';
-      deleteButton.textContent = 'Excluir';
-      deleteButton.addEventListener('click', async () => {
-        if (!confirm(`Excluir ${product.name || 'este produto'} do catálogo?`)) return;
-        try {
-          await storage.deleteProduct(product.id, { token });
-          await render();
-        } catch (error) {
-          alert(error.message || 'Não foi possível excluir o produto.');
-        }
-      });
-      item.appendChild(deleteButton);
-      productList.appendChild(item);
-    });
   }
 
   document.getElementById('add-entry')?.addEventListener('click', async () => {
@@ -171,42 +117,6 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (error) {
       alert(error.message || 'Não foi possível salvar o lançamento.');
     }
-  });
-
-  productForm?.addEventListener('submit', async (event) => {
-    event.preventDefault();
-    if (!productName.value.trim() || !productShort.value.trim() || !productPrice.value || productQuantity.value === '') {
-      alert('Preencha o nome, a descrição curta, o valor e a quantidade.');
-      return;
-    }
-
-    try {
-      await storage.saveProduct({
-        id: productId.value || undefined,
-        name: productName.value.trim(),
-        shortDescription: productShort.value.trim(),
-        description: productDescription.value.trim(),
-        price: Number(productPrice.value || 0),
-        imageUrl: productImage.value.trim(),
-        category: productCategory.value.trim(),
-        quantity: Number(productQuantity.value),
-        stock: Number(productQuantity.value),
-        featured: true,
-      }, { token });
-
-      productForm.reset();
-      productId.value = '';
-      await render();
-      alert('Produto salvo.');
-    } catch (error) {
-      alert(error.message || 'Não foi possível salvar o produto.');
-    }
-  });
-
-  document.getElementById('product-clear')?.addEventListener('click', () => {
-    productForm.reset();
-    productId.value = '';
-    productName.focus();
   });
 
   updateAuthUI();

@@ -7,13 +7,17 @@ document.addEventListener('DOMContentLoaded', () => {
   const galleryLabel = document.getElementById('gallery-label');
   const galleryAlt = document.getElementById('gallery-alt');
   const galleryImage = document.getElementById('gallery-image');
+  const galleryImagePreviewWrap = document.getElementById('gallery-image-preview-wrap');
+  const galleryImagePreview = document.getElementById('gallery-image-preview');
   const galleryFeatured = document.getElementById('gallery-featured');
   const galleryList = document.getElementById('gallery-admin-list');
   const galleryFeedback = document.getElementById('gallery-feedback');
   const formHeading = document.getElementById('gallery-form-heading');
+  let selectedImageData = '';
 
-  function setFeedback(message) {
+  function setFeedback(message, isError = false) {
     galleryFeedback.textContent = message;
+    galleryFeedback.classList.toggle('is-error', isError);
   }
 
   function getPreviewSource(imageUrl) {
@@ -21,6 +25,21 @@ document.addEventListener('DOMContentLoaded', () => {
       return `../../../cliente/src/images/${imageUrl.slice('../images/'.length)}`;
     }
     return imageUrl || '../../../cliente/src/images/social.jpg';
+  }
+
+  function showImagePreview(imageUrl) {
+    galleryImagePreviewWrap.hidden = !imageUrl;
+    if (imageUrl) galleryImagePreview.src = getPreviewSource(imageUrl);
+    else galleryImagePreview.removeAttribute('src');
+  }
+
+  function clearForm() {
+    galleryForm.reset();
+    galleryId.value = '';
+    selectedImageData = '';
+    formHeading.textContent = 'Adicionar imagem.';
+    showImagePreview('');
+    setFeedback('');
   }
 
   async function renderGallery() {
@@ -67,7 +86,9 @@ document.addEventListener('DOMContentLoaded', () => {
         galleryTitle.value = item.title || '';
         galleryLabel.value = item.label || '';
         galleryAlt.value = item.altText || '';
-        galleryImage.value = item.imageUrl || '';
+        galleryImage.value = '';
+        selectedImageData = item.imageUrl || '';
+        showImagePreview(selectedImageData);
         galleryFeatured.checked = Boolean(item.featured);
         formHeading.textContent = 'Editar imagem.';
         galleryTitle.focus();
@@ -97,30 +118,55 @@ document.addEventListener('DOMContentLoaded', () => {
 
   galleryForm.addEventListener('submit', async (event) => {
     event.preventDefault();
+    if (!selectedImageData) {
+      setFeedback('Selecione uma imagem para continuar.', true);
+      galleryImage.focus();
+      return;
+    }
+
     try {
       await storage.saveGalleryItem({
         id: galleryId.value || undefined,
         title: galleryTitle.value.trim(),
         label: galleryLabel.value.trim(),
         altText: galleryAlt.value.trim(),
-        imageUrl: galleryImage.value.trim(),
+        imageUrl: selectedImageData,
         featured: galleryFeatured.checked,
       }, { token });
       galleryForm.reset();
       galleryId.value = '';
+      selectedImageData = '';
       formHeading.textContent = 'Adicionar imagem.';
+      showImagePreview('');
       await renderGallery();
       setFeedback('Imagem salva.');
     } catch (error) {
-      setFeedback(error.message || 'Não foi possível salvar a imagem.');
+      setFeedback(error.message || 'Não foi possível salvar a imagem.', true);
+    }
+  });
+
+  galleryImage.addEventListener('change', async () => {
+    const file = galleryImage.files?.[0];
+    if (!file) return;
+    const previousImage = selectedImageData;
+    galleryImage.disabled = true;
+    setFeedback('Preparando imagem...');
+    try {
+      selectedImageData = await window.EliuzImageUpload.compress(file);
+      showImagePreview(selectedImageData);
+      setFeedback('Imagem pronta para salvar.');
+    } catch (error) {
+      selectedImageData = previousImage;
+      galleryImage.value = '';
+      showImagePreview(previousImage);
+      setFeedback(error.message || 'Não foi possível preparar a imagem.', true);
+    } finally {
+      galleryImage.disabled = false;
     }
   });
 
   document.getElementById('gallery-clear').addEventListener('click', () => {
-    galleryForm.reset();
-    galleryId.value = '';
-    formHeading.textContent = 'Adicionar imagem.';
-    setFeedback('');
+    clearForm();
     galleryTitle.focus();
   });
 
