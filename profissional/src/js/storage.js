@@ -10,18 +10,19 @@ window.EliuzStorage = (() => {
   ];
   const SERVICE_CATALOG = {
     '1.0 CORTE DE CABELO': { price: 40, duration: 60 },
-    '1.1 BARBA': { price: 40, duration: 60 },
-    '1.2 BARBA + SOBRANCELHA': { price: 50, duration: 60 },
+    '1.1 BARBA': { price: 40, duration: 60, priceGillette: 25, priceMachine: 40 },
+    '1.2 BARBA + SOBRANCELHA': { price: 50, duration: 60, priceGillette: 25, priceMachine: 40 },
     '1.3 CORTE + SOBRANCELHA': { price: 50, duration: 60 },
-    '1.4 CABELO E BARBA': { price: 70, duration: 120 },
-    '1.5 CORTE + BARBA + SOBRANCELHA': { price: 85, duration: 120 },
+    '1.4 CABELO E BARBA': { price: 70, duration: 120, priceGillette: 25, priceMachine: 40 },
+    '1.5 CORTE + BARBA + SOBRANCELHA': { price: 85, duration: 120, priceGillette: 25, priceMachine: 40 },
     '1.6 CORTE INFANTIL': { price: 40, duration: 60 },
     '1.7 SOBRANCELHA': { price: 15, duration: 15 },
-    '1.8 BARBA EXPRESS': { price: 25, duration: 30 },
+    '1.8 BARBA EXPRESS': { price: 25, duration: 30, priceGillette: 25, priceMachine: 40 },
     '1.9 RASPAR CABEÇA': { price: 25, duration: 30 },
     '2.0 PEZINHO': { price: 15, duration: 15 },
-    'BIGODE E CAVANHAQUE': { price: 15, duration: 30 },
+    'BIGODE E CAVANHAQUE': { price: 15, duration: 30, priceGillette: 25, priceMachine: 40 },
   };
+  const SERVICE_CATALOG_KEY = 'ELIUZ_SERVICE_CATALOG';
 
   function getApiBase() {
     if (typeof window.ELIUZ_API_BASE_URL === 'string' && window.ELIUZ_API_BASE_URL.trim()) {
@@ -175,11 +176,15 @@ window.EliuzStorage = (() => {
   }
 
   async function saveBooking(booking) {
+    const bookingPrice = booking.value !== undefined && booking.value !== null
+      ? Number(booking.value)
+      : SERVICE_CATALOG[booking.service]?.price || 0;
     const payload = {
       name: booking.name,
       phone: booking.phone,
       service: booking.service,
-      value: Number(booking.value) || SERVICE_CATALOG[booking.service]?.price || 0,
+      value: bookingPrice,
+      beardFinish: booking.beardFinish || '',
       date: booking.date,
       time: booking.time,
       customerId: booking.customerId || '',
@@ -204,13 +209,15 @@ window.EliuzStorage = (() => {
           nome: booking.name,
           telefone: booking.phone,
           servico: booking.service,
-          valor: Number(booking.value) || SERVICE_CATALOG[booking.service]?.price || 0,
+          valor: bookingPrice,
           data: booking.date,
           horario: booking.time,
           name: booking.name,
           phone: booking.phone,
           service: booking.service,
-          value: Number(booking.value) || SERVICE_CATALOG[booking.service]?.price || 0,
+          value: bookingPrice,
+          beardFinish: booking.beardFinish || '',
+          acabamentoBarba: booking.beardFinish || '',
           date: booking.date,
           time: booking.time,
         };
@@ -375,6 +382,22 @@ window.EliuzStorage = (() => {
         return normalized;
       }
     ).then((payload) => payload.customer || payload);
+  }
+
+  async function deleteCustomer(id, options = {}) {
+    const token = options.token || sessionStorage.getItem('ADMIN_TOKEN') || '';
+    return request(
+      '/api/customers',
+      {
+        method: 'DELETE',
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        body: JSON.stringify({ id }),
+      },
+      () => {
+        write('ELIUZ_CUSTOMERS', getLocalCustomers().filter((customer) => customer.id !== id));
+        return { ok: true };
+      }
+    );
   }
 
   async function getMessages(options = {}) {
@@ -587,7 +610,65 @@ window.EliuzStorage = (() => {
   }
 
   function getServiceCatalog() {
+    try {
+      const savedCatalog = JSON.parse(localStorage.getItem(SERVICE_CATALOG_KEY) || '{}');
+      Object.entries(savedCatalog).forEach(([name, service]) => {
+        if (SERVICE_CATALOG[name] && service && typeof service === 'object') {
+          if (SERVICE_CATALOG[name].priceGillette !== undefined
+            && Number(service.priceGillette) === SERVICE_CATALOG[name].price) {
+            service.priceGillette = 25;
+          }
+          if (SERVICE_CATALOG[name].priceMachine !== undefined
+            && Number(service.priceMachine) === SERVICE_CATALOG[name].price) {
+            service.priceMachine = 40;
+          }
+          Object.assign(SERVICE_CATALOG[name], service);
+        }
+      });
+    } catch (error) {
+      console.error('Não foi possível carregar os preços dos serviços salvos.', error);
+    }
     return SERVICE_CATALOG;
+  }
+
+  async function getServices() {
+    const payload = await request('/api/services', {}, () => ({ services: getServiceCatalog() }));
+    const services = payload?.services;
+    if (!services || typeof services !== 'object') {
+      throw new Error('A API retornou um catálogo de serviços inválido.');
+    }
+    Object.entries(services).forEach(([name, service]) => {
+      if (SERVICE_CATALOG[name] && service && typeof service === 'object') {
+        Object.assign(SERVICE_CATALOG[name], service);
+      }
+    });
+    write(SERVICE_CATALOG_KEY, SERVICE_CATALOG);
+    return SERVICE_CATALOG;
+  }
+
+  async function saveServices(services, options = {}) {
+    const token = options.token || sessionStorage.getItem('ADMIN_TOKEN') || '';
+    return request(
+      '/api/services',
+      {
+        method: 'POST',
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        body: JSON.stringify({ services }),
+      },
+      () => {
+        Object.entries(services).forEach(([name, service]) => {
+          if (SERVICE_CATALOG[name]) Object.assign(SERVICE_CATALOG[name], service);
+        });
+        write(SERVICE_CATALOG_KEY, SERVICE_CATALOG);
+        return { ok: true, services: SERVICE_CATALOG };
+      }
+    ).then((result) => {
+      Object.entries(result.services || services).forEach(([name, service]) => {
+        if (SERVICE_CATALOG[name]) Object.assign(SERVICE_CATALOG[name], service);
+      });
+      write(SERVICE_CATALOG_KEY, SERVICE_CATALOG);
+      return SERVICE_CATALOG;
+    });
   }
 
   function getCatalog() {
@@ -609,6 +690,7 @@ window.EliuzStorage = (() => {
     deleteGalleryItem,
     getCustomers,
     saveCustomer,
+    deleteCustomer,
     getMessages,
     saveMessage,
     getOrders,
@@ -619,6 +701,8 @@ window.EliuzStorage = (() => {
     deleteCashEntry,
     clearAll,
     getServiceCatalog,
+    getServices,
+    saveServices,
     getCatalog,
   };
 })();

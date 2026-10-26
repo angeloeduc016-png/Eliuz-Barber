@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="eliuz-api-base" content="">
+  <meta name="description" content="Gerencie os serviços e os valores da Eliuz Barber.">
+  <link rel="icon" href="../images/favicon.ico" type="image/x-icon">
+  <title>Serviços | Eliuz Barber</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Cormorant+Garamond:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body class="admin-site">
+  <header class="site-header">
+    <div class="container nav-shell">
+      <a class="brand" href="agendamentos.html"><span class="brand-mark"><img src="../images/logo.png" alt="Eliuz Barber" class="brand-logo"></span></a>
+      <button class="header-theme" type="button" data-theme-toggle aria-label="Usar tema do dispositivo" title="Tema do dispositivo">◐</button>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="professional-navigation" aria-label="Abrir menu"><span></span><span></span><span></span></button>
+      <nav class="site-nav professional-nav" id="professional-navigation">
+        <a href="agendamentos.html">Agenda</a>
+        <a href="clientes.html">Clientes</a>
+        <a href="finance.html">Financeiro</a>
+        <a aria-current="page" href="servicos.html">Serviços</a>
+        <a href="produtos.html">Produtos</a>
+        <a href="galeria.html">Galeria</a>
+      </nav>
+      <div id="admin-controls" class="admin-toolbar"></div>
+    </div>
+  </header>
+  <main class="section-pad">
+    <div class="container">
+      <div class="section-heading reveal is-visible">
+        <span class="eyebrow">Catálogo</span>
+        <h1>Serviços e valores.</h1>
+        <p>Atualize os preços exibidos durante o agendamento. Serviços com barba permitem valores separados para Gillette e máquina.</p>
+      </div>
+      <section class="service-admin-workspace">
+        <form id="service-form" class="service-admin-form">
+          <div id="service-price-list" class="service-price-list" aria-live="polite"></div>
+          <div class="toolbar service-admin-actions">
+            <button class="btn btn-primary" type="submit">Salvar valores</button>
+            <p id="service-feedback" class="form-feedback" role="status" aria-live="polite"></p>
+          </div>
+        </form>
+      </section>
+    </div>
+  </main>
+  <script>
+    if (!sessionStorage.getItem('ADMIN_TOKEN')) location.href = '../login.html';
+  </script>
+  <script src="../js/storage.js" defer></script>
+  <script src="../js/main.js" defer></script>
+  <script src="../js/servicos.js" defer></script>
+</body>
+</html>

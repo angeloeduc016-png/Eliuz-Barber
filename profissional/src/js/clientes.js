@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const total = document.getElementById('customer-total');
   const contactable = document.getElementById('customer-contactable');
   const active = document.getElementById('customer-active');
+  const feedback = document.getElementById('customer-feedback');
   let customers = [];
   let bookings = [];
   let selectedId = '';
@@ -49,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
     detail.innerHTML = `
       <div class="detail-heading"><span class="avatar">${name.charAt(0).toUpperCase()}</span><div><span class="eyebrow">Perfil</span><h3>${name}</h3></div></div>
       <dl class="customer-contact"><div><dt>Telefone</dt><dd>${phone || 'Não informado'}</dd></div><div><dt>E-mail</dt><dd>${email || 'Não informado'}</dd></div><div><dt>Serviço preferido</dt><dd>${service || 'Ainda não definido'}</dd></div></dl>
-      <div class="detail-history"><span class="eyebrow">Histórico</span><h4>${history.length} atendimento${history.length === 1 ? '' : 's'}</h4>${history.length ? `<ul>${history.slice(0, 5).map((booking) => `<li><span>${formatDate(valueOf(booking, 'date', 'data'))}</span><strong>${valueOf(booking, 'service', 'servico') || 'Serviço'}</strong><small>${valueOf(booking, 'time', 'horario') || ''}</small></li>`).join('')}</ul>` : '<p class="muted-copy">Nenhum agendamento encontrado para este cadastro.</p>'}</div>
+      <div class="detail-history"><span class="eyebrow">Histórico</span><h4>${history.length} atendimento${history.length === 1 ? '' : 's'}</h4>${history.length ? `<ul>${history.slice(0, 5).map((booking) => `<li><span>${formatDate(valueOf(booking, 'date', 'data'))}</span><strong>${valueOf(booking, 'service', 'servico') || 'Serviço'}${valueOf(booking, 'beardFinish', 'acabamentoBarba') ? ` · ${valueOf(booking, 'beardFinish', 'acabamentoBarba') === 'gillette' ? 'Gillette' : 'Máquina'}` : ''}</strong><small>${valueOf(booking, 'time', 'horario') || ''}</small></li>`).join('')}</ul>` : '<p class="muted-copy">Nenhum agendamento encontrado para este cadastro.</p>'}</div>
       ${phone ? `<a class="btn btn-primary detail-action" href="https://wa.me/55${normalizePhone(phone)}" target="_blank" rel="noreferrer">Abrir WhatsApp</a>` : ''}
     `;
   }
@@ -64,12 +65,40 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     filtered.forEach((customer) => {
       const id = valueOf(customer, 'id') || valueOf(customer, 'phone', 'telefone');
+      const row = document.createElement('div');
+      row.className = 'customer-directory-row';
       const item = document.createElement('button');
       item.type = 'button';
       item.className = `customer-directory-item${id === selectedId ? ' is-selected' : ''}`;
       item.innerHTML = `<span class="avatar">${(valueOf(customer, 'name', 'nome') || '?').charAt(0).toUpperCase()}</span><span><strong>${valueOf(customer, 'name', 'nome') || 'Cliente sem nome'}</strong><small>${valueOf(customer, 'phone', 'telefone') || valueOf(customer, 'email') || 'Sem contato informado'}</small></span><span class="directory-count">${customerBookings(customer).length}</span>`;
       item.addEventListener('click', () => { selectedId = id; renderList(); renderDetail(customer); });
-      list.appendChild(item);
+      row.appendChild(item);
+
+      const removeButton = document.createElement('button');
+      removeButton.type = 'button';
+      removeButton.className = 'customer-delete-button';
+      removeButton.textContent = 'Remover';
+      removeButton.disabled = !customer.id;
+      removeButton.setAttribute('aria-label', `Remover ${valueOf(customer, 'name', 'nome') || 'cliente'}`);
+      removeButton.addEventListener('click', async () => {
+        const customerName = valueOf(customer, 'name', 'nome') || 'este cliente';
+        if (!confirm(`Remover ${customerName} da base? Agendamentos e mensagens serão mantidos.`)) return;
+        try {
+          await storage.deleteCustomer(customer.id, { token });
+          if (selectedId === id) {
+            selectedId = '';
+            detail.innerHTML = '<div class="empty-state"><span class="eyebrow">Detalhes</span><h3>Selecione um cliente</h3><p>O histórico e os dados de contato aparecerão aqui.</p></div>';
+          }
+          await render();
+          feedback.textContent = 'Cliente removido. Agendamentos e mensagens foram preservados.';
+          feedback.classList.remove('is-error');
+        } catch (error) {
+          feedback.textContent = error.message || 'Não foi possível remover o cliente.';
+          feedback.classList.add('is-error');
+        }
+      });
+      row.appendChild(removeButton);
+      list.appendChild(row);
     });
   }
 

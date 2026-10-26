@@ -2468,7 +2468,24 @@ body.admin-site .professional-nav a[aria-current="page"] {
 .search-field input { margin: 0; }
 .customer-layout { display: grid; grid-template-columns: minmax(260px, 0.9fr) minmax(0, 1.1fr); gap: 20px; padding-top: 20px; }
 .customer-directory { display: grid; align-content: start; gap: 8px; max-height: 560px; overflow: auto; padding-right: 4px; }
+.customer-directory-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: stretch; gap: 8px; min-width: 0; }
 .customer-directory-item { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 12px; padding: 12px; border: 1px solid transparent; border-radius: 14px; background: rgba(255, 255, 255, 0.035); color: var(--text); text-align: left; cursor: pointer; }
+.customer-delete-button { min-width: 70px; padding: 0 10px; border: 1px solid rgba(255, 135, 120, 0.24); border-radius: 8px; background: rgba(255, 135, 120, 0.07); color: #f0a49b; font-size: 0.72rem; font-weight: 650; cursor: pointer; }
+.customer-delete-button:hover { border-color: rgba(255, 135, 120, 0.52); background: rgba(255, 135, 120, 0.13); }
+.customer-delete-button:disabled { opacity: 0.45; cursor: not-allowed; }
+.customer-feedback { min-height: 1.3em; margin: 12px 0 0; color: var(--accent-2); font-size: 0.78rem; }
+.customer-feedback.is-error { color: #ff9b91; }
+.service-admin-workspace { margin-top: 24px; padding: 24px; border: 1px solid var(--border); border-radius: var(--radius); background: linear-gradient(180deg, rgba(10, 18, 28, 0.94), rgba(9, 15, 24, 0.92)); box-shadow: var(--shadow); }
+.service-price-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.service-price-card { padding: 18px; border: 1px solid var(--border); border-radius: 14px; background: rgba(255, 255, 255, 0.025); }
+.service-price-card h2 { margin: 0 0 14px; font-size: 1rem; }
+.service-price-inputs { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; }
+.service-price-inputs.has-beard-prices { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.service-price-input { display: grid; gap: 6px; color: var(--muted); font-size: 0.75rem; }
+.service-price-input input { width: 100%; margin: 0; }
+.service-admin-actions { align-items: center; margin-top: 20px; }
+.service-admin-actions .form-feedback { flex: 1; }
+.service-admin-actions .form-feedback.is-error { color: #ff9b91; }
 .customer-directory-item:hover, .customer-directory-item.is-selected { border-color: rgba(245, 166, 35, 0.42); background: rgba(245, 166, 35, 0.09); }
 .customer-directory-item strong, .customer-directory-item small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .customer-directory-item small { margin-top: 3px; color: var(--muted); font-size: 0.75rem; }
@@ -2496,7 +2513,7 @@ html[data-theme="light"] body.admin-site .brand-mark { background: #13263c; }
 html[data-theme="light"] body.admin-site .professional-nav a { color: #55708c; }
 html[data-theme="light"] body.admin-site .professional-nav a:hover, html[data-theme="light"] body.admin-site .professional-nav a[aria-current="page"] { color: #075fc7; background: rgba(7, 95, 199, 0.08); border-color: rgba(7, 95, 199, 0.2); }
 html[data-theme="light"] body.admin-site .header-theme { color: #075fc7; border-color: rgba(7, 95, 199, 0.25); background: rgba(7, 95, 199, 0.06); }
-html[data-theme="light"] body.admin-site .feature-card, html[data-theme="light"] body.admin-site .booking-card, html[data-theme="light"] body.admin-site .finance-card, html[data-theme="light"] body.admin-site .schedule-card, html[data-theme="light"] body.admin-site .stat-card, html[data-theme="light"] body.admin-site .customer-workspace { background: rgba(255, 255, 255, 0.88); border-color: rgba(23, 48, 77, 0.13); box-shadow: 0 18px 45px rgba(23, 48, 77, 0.1); }
+html[data-theme="light"] body.admin-site .feature-card, html[data-theme="light"] body.admin-site .booking-card, html[data-theme="light"] body.admin-site .finance-card, html[data-theme="light"] body.admin-site .schedule-card, html[data-theme="light"] body.admin-site .stat-card, html[data-theme="light"] body.admin-site .customer-workspace, html[data-theme="light"] body.admin-site .service-admin-workspace { background: rgba(255, 255, 255, 0.88); border-color: rgba(23, 48, 77, 0.13); box-shadow: 0 18px 45px rgba(23, 48, 77, 0.1); }
 html[data-theme="light"] body.admin-site .login-card, html[data-theme="light"] body.admin-site .login-hero { background: rgba(255, 255, 255, 0.88); border-color: rgba(23, 48, 77, 0.13); box-shadow: 0 18px 45px rgba(23, 48, 77, 0.1); }
 html[data-theme="light"] body.admin-site .quick-link, html[data-theme="light"] body.admin-site .customer-detail, html[data-theme="light"] body.admin-site .customer-directory-item { background: rgba(7, 95, 199, 0.035); }
 
@@ -2516,6 +2533,8 @@ html[data-theme="light"] body.admin-site .quick-link, html[data-theme="light"] b
   body.admin-site .brand-logo { max-width: 92px; max-height: 35px; }
   body.admin-site .admin-toolbar .connection-status { display: none; }
   .quick-links, .customer-contact { grid-template-columns: 1fr; }
+  .service-admin-workspace { padding: 16px; }
+  .service-price-list { grid-template-columns: 1fr; }
   .customer-workspace { padding: 16px; }
   .customer-toolbar { align-items: stretch; flex-direction: column; gap: 12px; }
   .search-field { width: 100%; }

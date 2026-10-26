@@ -10,6 +10,7 @@ const apiModule = require('../backend/src/controllers/apiController');
 const vercelHandler = require('../api/[...path].js');
 const {
   getRoute,
+  normalizeBooking,
   normalizeGalleryItem,
   normalizeProduct,
   reconcileDefaultGallery,
@@ -22,9 +23,21 @@ test('getRoute normalizes API prefixes', () => {
   assert.equal(getRoute('/api/auth/login'), 'auth/login');
 });
 
-test('roteia mutações de produtos e galeria pelas rotas-base', async () => {
-  for (const route of ['products', 'gallery']) {
-    for (const method of ['POST', 'DELETE']) {
+test('normaliza o acabamento e o valor escolhidos no agendamento', () => {
+  const booking = normalizeBooking({
+    service: '1.1 BARBA',
+    value: 45,
+    beardFinish: 'maquina',
+  });
+
+  assert.equal(booking.value, 45);
+  assert.equal(booking.beardFinish, 'maquina');
+  assert.equal(booking.acabamentoBarba, 'maquina');
+});
+
+test('roteia mutações de produtos, galeria, clientes e serviços pelas rotas-base', async () => {
+  for (const [route, methods] of [['products', ['POST', 'DELETE']], ['gallery', ['POST', 'DELETE']], ['customers', ['DELETE']], ['services', ['POST']]]) {
+    for (const method of methods) {
       const response = await apiModule.handleRequest({
         path: `/${route}`,
         httpMethod: method,
@@ -47,8 +60,13 @@ test('mantém Content-Type JSON junto ao token nas mutações autenticadas', asy
       localStorage: { getItem: () => null, setItem: () => {} },
       sessionStorage: { getItem: () => '', removeItem: () => {} },
       fetch: async (url, options) => {
-        requests.push({ url, headers: options.headers });
-        return { ok: true, json: async () => ({ product: {}, item: {} }) };
+        requests.push({ url, headers: options.headers, body: options.body ? JSON.parse(options.body) : null });
+        return {
+          ok: true,
+          json: async () => url.endsWith('/services')
+            ? { services: options.body ? JSON.parse(options.body).services : { '1.1 BARBA': { price: 40, priceGillette: 50, priceMachine: 45, duration: 60 } } }
+            : { product: {}, item: {}, booking: {} },
+        };
       },
     });
     const storagePath = path.join(__dirname, '..', app, 'src', 'js', 'storage.js');
@@ -59,17 +77,64 @@ test('mantém Content-Type JSON junto ao token nas mutações autenticadas', asy
       shortDescription: 'Descrição de teste',
       price: 20,
     }, { token: 'test-token' });
+    await context.window.EliuzStorage.getServices();
+    await context.window.EliuzStorage.saveServices({
+      '1.1 BARBA': { price: 40, priceGillette: 50, priceMachine: 45, duration: 60 },
+    }, { token: 'test-token' });
+    await context.window.EliuzStorage.saveBooking({
+      name: 'Cliente teste',
+      phone: '19999999999',
+      service: '1.1 BARBA',
+      value: 45,
+      beardFinish: 'maquina',
+      date: '2030-01-01',
+      time: '10:00',
+    });
     if (app === 'profissional') {
       await context.window.EliuzStorage.saveGalleryItem({
         title: 'Imagem de teste',
         imageUrl: 'data:image/jpeg;base64,dGVzdA==',
       }, { token: 'test-token' });
+      await context.window.EliuzStorage.deleteCustomer('customer-id', { token: 'test-token' });
     }
 
-    assert.equal(requests.length, app === 'profissional' ? 2 : 1);
+    assert.equal(requests.length, app === 'profissional' ? 6 : 4);
+    const serviceSave = requests.find(({ url, body }) => url.endsWith('/services') && body);
+    assert.ok(serviceSave.headers.Authorization);
+    assert.equal(serviceSave.body.services['1.1 BARBA'].priceMachine, 45);
+    const bookingSave = requests.find(({ url, body }) => url.endsWith('/bookings') && body);
+    assert.equal(bookingSave.body.value, 45);
+    assert.equal(bookingSave.body.beardFinish, 'maquina');
+    if (app === 'profissional') {
+      const customerDelete = requests.find(({ url, body }) => url.endsWith('/customers') && body);
+      assert.equal(customerDelete.body.id, 'customer-id');
+    }
     requests.forEach(({ headers }) => {
       assert.equal(headers['Content-Type'], 'application/json');
-      assert.equal(headers.Authorization, 'Bearer test-token');
+    });
+    requests.filter(({ url, body }) => body && (url.endsWith('/services') || url.endsWith('/products') || url.endsWith('/gallery') || url.endsWith('/customers'))).forEach(({ headers }) => {
+      assert.ok(headers.Authorization);
+    });
+  }
+});
+
+test('define os preços padrão de barba como R$ 25 para Gillette e R$ 40 para máquina', () => {
+  for (const app of ['cliente', 'profissional']) {
+    const context = vm.createContext({
+      window: { location: { protocol: 'file:', hostname: '' } },
+      document: { querySelector: () => null },
+      localStorage: { getItem: () => null, setItem: () => {} },
+      sessionStorage: { getItem: () => '', removeItem: () => {} },
+    });
+    const storagePath = path.join(__dirname, '..', app, 'src', 'js', 'storage.js');
+    vm.runInContext(fs.readFileSync(storagePath, 'utf8'), context, { filename: storagePath });
+    const catalog = context.window.EliuzStorage.getServiceCatalog();
+    const beardServices = Object.entries(catalog).filter(([name]) => name.includes('BARBA'));
+
+    assert.ok(beardServices.length > 0);
+    beardServices.forEach(([, service]) => {
+      assert.equal(service.priceGillette, 25);
+      assert.equal(service.priceMachine, 40);
     });
   }
 });

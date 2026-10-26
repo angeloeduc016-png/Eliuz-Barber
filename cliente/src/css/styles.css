@@ -882,6 +882,11 @@ body {
   gap: 14px;
 }
 
+.booking-card form [hidden],
+.booking-card form input[type="hidden"] {
+  display: none !important;
+}
+
 label {
   display: grid;
   gap: 8px;
@@ -1615,6 +1620,36 @@ textarea:focus {
   margin: 0;
   color: var(--accent-2);
   font-weight: 600;
+}
+
+.beard-finish-options {
+  min-width: 0;
+  padding: 0;
+  border: 0;
+}
+.beard-finish-options legend {
+  margin-bottom: 8px;
+  font-size: 0.86rem;
+  font-weight: 650;
+}
+.beard-finish-buttons {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.beard-finish-buttons button {
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+}
+.beard-finish-buttons button[aria-pressed="true"] {
+  border-color: var(--accent);
+  background: rgba(245, 166, 35, 0.12);
+  color: var(--accent-2);
 }
 
 .booking-list {
@@ -3433,6 +3468,14 @@ html:not([data-theme="light"]) body.client-site .surface {
   outline: none;
 }
 
+.booking-time-grid .time-btn.selected,
+.booking-time-grid .time-btn.selected:hover,
+.booking-time-grid .time-btn.selected:focus-visible {
+  background: var(--accent);
+  color: var(--brand-blue);
+  border-color: rgba(78, 168, 255, 0.8);
+}
+
 @media (max-width: 420px) {
   .booking-time-grid {
     gap: 6px;
@@ -3628,6 +3671,100 @@ html:not([data-theme="light"]) body.client-site .surface {
   color: var(--accent-2);
   font-size: 2rem;
   line-height: 1;
+}
+
+html[data-theme="light"] body.client-site .booking-widget {
+  color-scheme: light;
+  border-color: rgba(20, 43, 70, 0.16);
+  background: #f8fbff;
+  color: #142b46;
+  box-shadow: 0 30px 90px rgba(20, 43, 70, 0.24);
+}
+
+html[data-theme="light"] body.client-site .booking-widget::backdrop {
+  background: rgba(20, 43, 70, 0.32);
+}
+
+html[data-theme="light"] body.client-site .booking-widget .booking-card {
+  border-color: rgba(20, 43, 70, 0.12);
+  background: #ffffff;
+  color: #142b46;
+  box-shadow: 0 12px 30px rgba(20, 43, 70, 0.08);
+}
+
+html[data-theme="light"] body.client-site .booking-widget .booking-card h2,
+html[data-theme="light"] body.client-site .booking-widget .booking-date-picker > h3,
+html[data-theme="light"] body.client-site .booking-widget .booking-time-picker > h3,
+html[data-theme="light"] body.client-site .booking-widget .booking-date-picker-heading strong,
+html[data-theme="light"] body.client-site .booking-widget .booking-time-shift-heading strong {
+  color: #142b46;
+}
+
+html[data-theme="light"] body.client-site .booking-widget .booking-date-picker,
+html[data-theme="light"] body.client-site .booking-widget .booking-time-shift-heading {
+  border-color: rgba(20, 43, 70, 0.14);
+}
+
+html[data-theme="light"] body.client-site .booking-widget .booking-date-arrow,
+html[data-theme="light"] body.client-site .booking-widget .booking-date-day,
+html[data-theme="light"] body.client-site .booking-widget .booking-time-shift-heading small {
+  border-color: rgba(20, 43, 70, 0.16);
+  background: #f1f6fc;
+  color: #142b46;
+}
+
+html[data-theme="light"] body.client-site .booking-widget .booking-date-day span,
+html[data-theme="light"] body.client-site .booking-widget .booking-time-shift-heading small {
+  color: #5a6f86;
+}
+
+html[data-theme="light"] body.client-site .booking-widget .booking-date-day.is-selected,
+html[data-theme="light"] body.client-site .booking-widget .booking-date-day.is-selected span {
+  border-color: #075fc7;
+  background: #075fc7;
+  color: #ffffff;
+}
+
+html[data-theme="light"] body.client-site .booking-widget .booking-date-day.is-disabled {
+  color: #7d8da0;
+}
+
+html[data-theme="light"] body.client-site .booking-widget .booking-time-grid .time-btn {
+  border-color: rgba(7, 95, 199, 0.48);
+  background: #ffffff;
+  color: #173b65;
+}
+
+html[data-theme="light"] body.client-site .booking-widget .booking-time-grid .time-btn:hover,
+html[data-theme="light"] body.client-site .booking-widget .booking-time-grid .time-btn:focus-visible,
+html[data-theme="light"] body.client-site .booking-widget .booking-time-grid .time-btn.selected,
+html[data-theme="light"] body.client-site .booking-widget .booking-time-grid .time-btn.selected:hover,
+html[data-theme="light"] body.client-site .booking-widget .booking-time-grid .time-btn.selected:focus-visible {
+  border-color: #075fc7;
+  background: #075fc7;
+  color: #ffffff;
+}
+
+html[data-theme="light"] body.client-site .booking-widget .beard-finish-buttons button {
+  border-color: rgba(20, 43, 70, 0.18);
+  background: #f1f6fc;
+  color: #173b65;
+}
+
+html[data-theme="light"] body.client-site .booking-widget .beard-finish-buttons button[aria-pressed="true"] {
+  border-color: #075fc7;
+  background: rgba(7, 95, 199, 0.12);
+  color: #075fc7;
+}
+
+html[data-theme="light"] body.client-site .booking-widget .booking-widget-close {
+  border-color: rgba(20, 43, 70, 0.18);
+  background: #ffffff;
+  color: #173b65;
+}
+
+html[data-theme="light"] body.client-site .booking-widget .booking-widget-close:hover {
+  background: #e8f1fb;
 }
 
 .gallery-grid {

@@ -82,7 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <strong>${booking.name || booking.nome || ''}</strong><br>
           <small>${booking.phone || booking.telefone || ''}</small>
         </td>
-        <td>${booking.service || booking.servico || ''}</td>
+        <td>${booking.service || booking.servico || ''}${booking.beardFinish || booking.acabamentoBarba ? `<br><small>Barba: ${booking.beardFinish === 'gillette' || booking.acabamentoBarba === 'gillette' ? 'Gillette' : 'Máquina'}</small>` : ''}</td>
         <td>${booking.date || booking.data || ''}</td>
         <td>${booking.time || booking.horario || ''}</td>
         <td>${booking.notes || booking.observacao || '-'}</td>

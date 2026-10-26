@@ -9,17 +9,17 @@ const { createSession, getSession, sessionCookie, clearSessionCookie } = require
 
 const SERVICE_CATALOG = {
   '1.0 CORTE DE CABELO': { price: 40, duration: 60 },
-  '1.1 BARBA': { price: 40, duration: 60 },
-  '1.2 BARBA + SOBRANCELHA': { price: 50, duration: 60 },
+  '1.1 BARBA': { price: 40, duration: 60, priceGillette: 25, priceMachine: 40 },
+  '1.2 BARBA + SOBRANCELHA': { price: 50, duration: 60, priceGillette: 25, priceMachine: 40 },
   '1.3 CORTE + SOBRANCELHA': { price: 50, duration: 60 },
-  '1.4 CABELO E BARBA': { price: 70, duration: 120 },
-  '1.5 CORTE + BARBA + SOBRANCELHA': { price: 85, duration: 120 },
+  '1.4 CABELO E BARBA': { price: 70, duration: 120, priceGillette: 25, priceMachine: 40 },
+  '1.5 CORTE + BARBA + SOBRANCELHA': { price: 85, duration: 120, priceGillette: 25, priceMachine: 40 },
   '1.6 CORTE INFANTIL': { price: 40, duration: 60 },
   '1.7 SOBRANCELHA': { price: 15, duration: 15 },
-  '1.8 BARBA EXPRESS': { price: 25, duration: 30 },
+  '1.8 BARBA EXPRESS': { price: 25, duration: 30, priceGillette: 25, priceMachine: 40 },
   '1.9 RASPAR CABEÇA': { price: 25, duration: 30 },
   '2.0 PEZINHO': { price: 15, duration: 15 },
-  'BIGODE E CAVANHAQUE': { price: 15, duration: 30 },
+  'BIGODE E CAVANHAQUE': { price: 15, duration: 30, priceGillette: 25, priceMachine: 40 },
 };
 
 const DEFAULT_ADMIN_LOGIN = process.env.ADMIN_LOGIN || '41967582000167';
@@ -223,6 +223,7 @@ function normalizeBooking(input = {}) {
   const phone = input.phone || input.telefone || '';
   const email = input.email || '';
   const notes = input.notes || input.observation || input.observacao || '';
+  const beardFinish = input.beardFinish || input.acabamentoBarba || '';
   const customerId = input.customerId || input.clienteId || '';
 
   return {
@@ -236,6 +237,7 @@ function normalizeBooking(input = {}) {
     date,
     time,
     notes,
+    beardFinish,
     nome: name,
     telefone: phone,
     servico: service,
@@ -243,9 +245,59 @@ function normalizeBooking(input = {}) {
     data: date,
     horario: time,
     observacao: notes,
+    acabamentoBarba: beardFinish,
     createdAt: input.createdAt || new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };
+}
+
+async function getServiceCatalog(context) {
+  const savedServices = await listCollection(context, 'services');
+  const catalog = Object.fromEntries(Object.entries(SERVICE_CATALOG).map(([name, service]) => {
+    const saved = savedServices.find((item) => item.id === name);
+    const merged = { ...service, ...(saved || {}) };
+    if (name.toLocaleUpperCase('pt-BR').includes('BARBA')) {
+      const legacyDefaultPrice = service.price;
+      merged.priceGillette = Number(saved?.priceGillette === legacyDefaultPrice ? 25 : merged.priceGillette ?? 25);
+      merged.priceMachine = Number(saved?.priceMachine === legacyDefaultPrice ? 40 : merged.priceMachine ?? 40);
+    }
+    return [name, merged];
+  }));
+  return catalog;
+}
+
+async function saveServiceCatalog(context, input = {}) {
+  const services = input.services && typeof input.services === 'object' ? input.services : {};
+  const currentCatalog = await getServiceCatalog(context);
+  const updated = [];
+
+  for (const [name, current] of Object.entries(currentCatalog)) {
+    const submitted = services[name];
+    if (!submitted || typeof submitted !== 'object') {
+      return { error: `Informe os valores do serviço ${name}.` };
+    }
+
+    const price = Number(submitted.price);
+    if (!Number.isFinite(price) || price < 0) {
+      return { error: `Informe um valor válido para ${name}.` };
+    }
+
+    const service = { ...current, price };
+    if (name.toLocaleUpperCase('pt-BR').includes('BARBA')) {
+      const priceGillette = Number(submitted.priceGillette);
+      const priceMachine = Number(submitted.priceMachine);
+      if (!Number.isFinite(priceGillette) || priceGillette < 0
+        || !Number.isFinite(priceMachine) || priceMachine < 0) {
+        return { error: `Informe valores válidos para os acabamentos de ${name}.` };
+      }
+      service.priceGillette = priceGillette;
+      service.priceMachine = priceMachine;
+    }
+    updated.push({ id: name, ...service, updatedAt: new Date().toISOString() });
+  }
+
+  await writeCollection(context, 'services', updated);
+  return { services: Object.fromEntries(updated.map(({ id, ...service }) => [id, service])) };
 }
 
 function normalizeCustomer(input = {}) {
@@ -558,6 +610,7 @@ async function listBookings(context, scope) {
   return bookings.map((booking) => ({
     id: booking.id,
     service: booking.service,
+    beardFinish: booking.beardFinish || '',
     date: booking.date,
     time: booking.time,
     valor: booking.valor,
@@ -576,6 +629,20 @@ async function createBooking(context, payload) {
 
   if (booking.date < todayStr()) {
     return { error: 'Não é possível agendar em uma data passada.' };
+  }
+
+  if (booking.beardFinish && !['gillette', 'maquina'].includes(booking.beardFinish)) {
+    return { error: 'Selecione um acabamento de barba válido.' };
+  }
+  const serviceDetails = (await getServiceCatalog(context))[booking.service];
+  if (serviceDetails) {
+    if (booking.beardFinish) {
+      const priceKey = booking.beardFinish === 'gillette' ? 'priceGillette' : 'priceMachine';
+      booking.value = Number(serviceDetails[priceKey] ?? serviceDetails.price);
+    } else if (!booking.service.toLocaleUpperCase('pt-BR').includes('BARBA')) {
+      booking.value = Number(serviceDetails.price);
+    }
+    booking.valor = booking.value;
   }
 
   const customer = await upsertCustomer(context, {
@@ -754,12 +821,22 @@ async function handleRequest(event, context) {
   }
 
   if (route === 'services' && method === 'GET') {
-    return json(200, { ok: true, services: SERVICE_CATALOG });
+    return json(200, { ok: true, services: await getServiceCatalog(context) });
+  }
+
+  if (route === 'services' && method === 'POST') {
+    if (!isAuthorized(event)) {
+      return json(401, { ok: false, message: 'Não autorizado.' });
+    }
+
+    const result = await saveServiceCatalog(context, await readBody(event));
+    if (result.error) return json(400, { ok: false, message: result.error });
+    return json(200, { ok: true, services: result.services });
   }
 
   if (route === 'catalog' && method === 'GET') {
     const products = await listProducts(context);
-    return json(200, { ok: true, services: SERVICE_CATALOG, products });
+    return json(200, { ok: true, services: await getServiceCatalog(context), products });
   }
 
   if (route === 'products' && method === 'GET') {
@@ -868,6 +945,24 @@ async function handleRequest(event, context) {
     }
 
     return json(201, { ok: true, customer: result });
+  }
+
+  if (route === 'customers' && method === 'DELETE') {
+    if (!isAuthorized(event)) {
+      return json(401, { ok: false, message: 'Não autorizado.' });
+    }
+
+    const body = await readBody(event);
+    const customerId = String(body.id || event.queryStringParameters?.id || '').trim();
+    if (!customerId) return json(400, { ok: false, message: 'Informe o cliente que deseja remover.' });
+
+    const customers = await listCollection(context, 'customers');
+    if (!customers.some((customer) => customer.id === customerId)) {
+      return json(404, { ok: false, message: 'Cliente não encontrado.' });
+    }
+
+    await deleteCollectionItem(context, 'customers', customerId);
+    return json(200, { ok: true });
   }
 
   if (route === 'messages' && method === 'GET') {
@@ -1130,6 +1225,7 @@ async function handleRequest(event, context) {
 module.exports = {
   getRoute,
   handleRequest,
+  normalizeBooking,
   normalizeGalleryItem,
   normalizeProduct,
   reconcileDefaultGallery,

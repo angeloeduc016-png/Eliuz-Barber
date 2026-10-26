@@ -28,13 +28,13 @@ A camada de persistência está em `src/database/store.js`, com o modelo Sequeli
 
 ## Rotas usadas pelo frontend
 
-- `GET/POST /api/customers`
+- `GET/POST/DELETE /api/customers` (`DELETE` requires the admin token)
 - `GET/POST/PATCH /api/bookings`
 - `GET/POST/PATCH /api/products`
 - `GET/POST/PATCH/DELETE /api/orders`
 - `GET/POST/PATCH /api/messages`
 - `GET/POST/DELETE /api/cash`
-- `GET /api/catalog` e `GET /api/services`
+- `GET /api/catalog` e `GET/POST /api/services` (`POST` requires the admin token; beard prices are configured separately for Gillette and machine)
 - `POST /api/auth/login`, `GET /api/auth/session` e OAuth social
 
 O cliente e o painel devem enviar cookies com credenciais quando estiverem em domínios diferentes. O frontend já usa `credentials: include` nas sessões OAuth.

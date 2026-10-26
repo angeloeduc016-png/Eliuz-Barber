@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
   const storage = window.EliuzStorage;
   const serviceSelect = document.getElementById('service-select');
+  const beardFinishOptions = document.getElementById('beard-finish-options');
   const dateInput = document.getElementById('booking-date');
   const dateStrip = document.getElementById('booking-date-strip');
   const monthLabel = document.getElementById('booking-month-label');
@@ -22,7 +23,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const orderCustomerName = document.getElementById('order-customer-name');
   const orderCustomerPhone = document.getElementById('order-customer-phone');
   const orderNotes = document.getElementById('order-notes');
-  const bookingNotes = document.getElementById('booking-notes');
   const bookingNameInput = document.getElementById('booking-name');
   const bookingPhoneInput = document.getElementById('booking-phone');
   const bookingEmailInput = document.getElementById('booking-email');
@@ -35,6 +35,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const serviceSort = document.getElementById('service-sort');
   const serviceCatalog = storage?.getServiceCatalog ? storage.getServiceCatalog() : {};
   const serviceEntries = Object.entries(serviceCatalog);
+  let selectedBeardFinish = '';
+  let selectedTime = '';
+  let renderedTimeDate = '';
+  let timeRenderSequence = 0;
   const currentCustomer = { id: '', name: '', phone: '', email: '' };
   const pad = (value) => String(value).padStart(2, '0');
 
@@ -50,6 +54,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function formatBRL(value) {
     return Number(value || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  }
+
+  function hasBeard(serviceName) {
+    return /(?:^|\W)BARBA(?:$|\W)/.test(String(serviceName || '').toLocaleUpperCase('pt-BR'));
+  }
+
+  function lowestServicePrice(data) {
+    return hasBeard(data.name)
+      ? Math.min(Number(data.priceGillette ?? data.price), Number(data.priceMachine ?? data.price))
+      : Number(data.price);
   }
 
   function dateToString(date) {
@@ -175,7 +189,7 @@ document.addEventListener('DOMContentLoaded', () => {
       button.type = 'button';
       button.dataset.openBooking = '';
       button.dataset.serviceChoice = name;
-      button.innerHTML = `<span class="service-choice-icon service-icon-${data.icon || 1}" aria-hidden="true"></span><div class="service-choice-copy"><strong>${name}</strong><span>${formatBRL(data.price)} <small>${data.duration} min</small></span></div><b>Agendar</b>`;
+      button.innerHTML = `<span class="service-choice-icon service-icon-${data.icon || 1}" aria-hidden="true"></span><div class="service-choice-copy"><strong>${name}</strong><span>${hasBeard(name) ? 'A partir de ' : ''}${formatBRL(lowestServicePrice({ ...data, name }))} <small>${data.duration} min</small></span></div><b>Agendar</b>`;
       button.addEventListener('click', () => openWidget(name));
       serviceChoiceGrid.appendChild(button);
     });
@@ -188,16 +202,36 @@ document.addEventListener('DOMContentLoaded', () => {
     serviceEntries.forEach(([name, data]) => {
       const option = document.createElement('option');
       option.value = name;
-      option.textContent = `${name} - ${formatBRL(data.price)} (${data.duration} min)`;
+      option.textContent = `${name} - ${hasBeard(name) ? 'a partir de ' : ''}${formatBRL(lowestServicePrice({ ...data, name }))} (${data.duration} min)`;
       serviceSelect.appendChild(option);
+    });
+  }
+
+  function renderBeardFinishOptions() {
+    if (!beardFinishOptions) return;
+    const service = serviceCatalog[serviceSelect?.value || ''];
+    const showOptions = Boolean(service && hasBeard(serviceSelect.value));
+    beardFinishOptions.hidden = !showOptions;
+    if (!showOptions) {
+      selectedBeardFinish = '';
+      return;
+    }
+
+    beardFinishOptions.querySelectorAll('[data-beard-finish]').forEach((button) => {
+      const finish = button.dataset.beardFinish;
+      const price = finish === 'gillette'
+        ? Number(service.priceGillette ?? service.price)
+        : Number(service.priceMachine ?? service.price);
+      button.textContent = `${finish === 'gillette' ? 'Gillette' : 'Máquina'} · ${formatBRL(price)}`;
+      button.setAttribute('aria-pressed', String(finish === selectedBeardFinish));
     });
   }
 
   function sortServiceEntries() {
     const entries = [...serviceEntries];
     const mode = serviceSort?.value || 'default';
-    if (mode === 'price-asc') entries.sort((a, b) => a[1].price - b[1].price || a[0].localeCompare(b[0]));
-    if (mode === 'price-desc') entries.sort((a, b) => b[1].price - a[1].price || a[0].localeCompare(b[0]));
+    if (mode === 'price-asc') entries.sort((a, b) => lowestServicePrice({ ...a[1], name: a[0] }) - lowestServicePrice({ ...b[1], name: b[0] }) || a[0].localeCompare(b[0]));
+    if (mode === 'price-desc') entries.sort((a, b) => lowestServicePrice({ ...b[1], name: b[0] }) - lowestServicePrice({ ...a[1], name: a[0] }) || a[0].localeCompare(b[0]));
     if (mode === 'name-asc') entries.sort((a, b) => a[0].localeCompare(b[0]));
     if (mode === 'name-desc') entries.sort((a, b) => b[0].localeCompare(a[0]));
     renderServiceChoices(entries);
@@ -207,14 +241,20 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!timeContainer || !timeValueInput || !dateInput) return;
 
     const selectedDate = dateInput.value;
+    if (selectedDate !== renderedTimeDate) {
+      selectedTime = '';
+      timeValueInput.value = '';
+      renderedTimeDate = selectedDate;
+    }
+    const renderSequence = ++timeRenderSequence;
     const bookings = await getBookings();
+    if (renderSequence !== timeRenderSequence || selectedDate !== dateInput.value) return;
     const bookedTimes = bookings
       .filter((booking) => (booking.date || booking.data) === selectedDate)
       .map((booking) => booking.time || booking.horario)
       .filter(Boolean);
 
     timeContainer.innerHTML = '';
-    timeValueInput.value = '';
 
     if (!selectedDate) {
       const placeholder = document.createElement('div');
@@ -267,13 +307,19 @@ document.addEventListener('DOMContentLoaded', () => {
       shift.times.forEach((time) => {
         const button = document.createElement('button');
         button.type = 'button';
-        button.className = 'time-btn';
+        const isSelected = selectedTime === time;
+        button.className = `time-btn${isSelected ? ' selected' : ''}`;
+        button.setAttribute('aria-pressed', String(isSelected));
         button.textContent = time;
         button.addEventListener('click', () => {
-          timeContainer.querySelectorAll('.time-btn').forEach((item) => item.classList.remove('selected'));
+          timeContainer.querySelectorAll('.time-btn').forEach((item) => {
+            item.classList.remove('selected');
+            item.setAttribute('aria-pressed', 'false');
+          });
+          selectedTime = time;
           button.classList.add('selected');
+          button.setAttribute('aria-pressed', 'true');
           timeValueInput.value = time;
-          button.remove();
         });
         shiftGrid.appendChild(button);
       });
@@ -341,7 +387,7 @@ document.addEventListener('DOMContentLoaded', () => {
       row.className = 'timeline-item';
       row.innerHTML = `
         <div>
-          <strong>${booking.service || booking.servico || 'Agendamento'}</strong>
+          <strong>${booking.service || booking.servico || 'Agendamento'}${booking.beardFinish || booking.acabamentoBarba ? ` · ${booking.beardFinish === 'gillette' || booking.acabamentoBarba === 'gillette' ? 'Gillette' : 'Máquina'}` : ''}</strong>
           <p>${booking.date || booking.data || ''} às ${booking.time || booking.horario || ''}</p>
         </div>
         <div>${formatBRL(booking.value || booking.valor || 0)}</div>
@@ -392,20 +438,21 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function getBookingPayload() {
-    if (!bookingForm?.reportValidity()) {
-      return null;
-    }
-
-    const name = bookingNameInput?.value.trim() || '';
-    const phone = bookingPhoneInput?.value.trim() || '';
-    const email = bookingEmailInput?.value.trim() || '';
+    const customer = window.EliuzAuth?.getCustomer() || currentCustomer;
+    const name = customer?.name || currentCustomer.name;
+    const phone = customer?.phone || currentCustomer.phone;
+    const email = customer?.email || currentCustomer.email;
     const service = serviceSelect?.value || '';
     const date = dateInput?.value || '';
     const time = timeValueInput?.value || '';
-    const notes = bookingNotes?.value.trim() || '';
-    const price = serviceCatalog[service]?.price || 0;
+    const includesBeard = hasBeard(service);
+    const price = includesBeard
+      ? Number(selectedBeardFinish === 'gillette'
+        ? serviceCatalog[service]?.priceGillette ?? serviceCatalog[service]?.price
+        : serviceCatalog[service]?.priceMachine ?? serviceCatalog[service]?.price)
+      : Number(serviceCatalog[service]?.price || 0);
 
-    if (!name || !phone || !service || !date || !time) {
+    if (!name || !phone || !service || !date || !time || (includesBeard && !selectedBeardFinish)) {
       return null;
     }
 
@@ -416,8 +463,9 @@ document.addEventListener('DOMContentLoaded', () => {
       service,
       date,
       time,
-      notes,
+      notes: '',
       value: price,
+      beardFinish: selectedBeardFinish,
       customerId: bookingCustomerIdInput?.value || currentCustomer.id || '',
     };
   }
@@ -425,10 +473,19 @@ document.addEventListener('DOMContentLoaded', () => {
   function openWidget(serviceName = '') {
     if (!bookingWidget) return;
     if (window.EliuzAuth && !window.EliuzAuth.getCustomer()) {
-      window.EliuzAuth.requireAuth(() => openWidget(serviceName));
+      const returnUrl = new URL(window.location.href);
+      returnUrl.searchParams.set('bookingService', serviceName);
+      const loginPath = window.location.pathname.includes('/pages/') ? 'login.html' : 'pages/login.html';
+      const loginUrl = new URL(loginPath, window.location.href);
+      loginUrl.searchParams.set('returnTo', returnUrl.href);
+      window.location.assign(loginUrl.href);
       return;
     }
-    if (serviceName && serviceSelect) serviceSelect.value = serviceName;
+    if (serviceName && serviceSelect) {
+      serviceSelect.value = serviceName;
+      selectedBeardFinish = '';
+      renderBeardFinishOptions();
+    }
     if (dateInput && !dateInput.value) selectDate(new Date(`${minDateStr}T00:00:00`));
     renderDateStrip();
     if (typeof bookingWidget.showModal === 'function') {
@@ -449,25 +506,6 @@ document.addEventListener('DOMContentLoaded', () => {
     bookingWidget.classList.remove('is-open');
   }
 
-  if (dateInput) {
-    dateInput.setAttribute('aria-describedby', 'date-help');
-    if (window.flatpickr) {
-      flatpickr(dateInput, {
-        altInput: true,
-        altFormat: 'd/m/Y',
-        dateFormat: 'Y-m-d',
-        minDate: minDateStr,
-        maxDate: maxDateStr,
-        disable: [function(date) { return date.getDay() === 0; }],
-        locale: 'pt',
-        onChange: renderTimeOptions,
-      });
-    } else {
-      dateInput.min = minDateStr;
-      dateInput.max = maxDateStr;
-    }
-  }
-
   previousWeekButton?.addEventListener('click', () => {
     if (previousWeekButton.disabled) return;
     dateStripStart.setDate(dateStripStart.getDate() - 7);
@@ -481,6 +519,13 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   serviceSort?.addEventListener('change', sortServiceEntries);
+
+  beardFinishOptions?.querySelectorAll('[data-beard-finish]').forEach((button) => {
+    button.addEventListener('click', () => {
+      selectedBeardFinish = button.dataset.beardFinish || '';
+      renderBeardFinishOptions();
+    });
+  });
 
   window.addEventListener('eliuz:authenticated', openWidget);
 
@@ -498,37 +543,30 @@ document.addEventListener('DOMContentLoaded', () => {
     event.preventDefault();
     const payload = getBookingPayload();
     if (!payload) {
-      alert('Preencha todos os campos do agendamento.');
+      alert(hasBeard(serviceSelect?.value) && !selectedBeardFinish
+        ? 'Escolha Gillette ou Máquina para a barba.'
+        : 'Selecione uma data e um horário disponíveis.');
       return;
     }
 
     try {
-      const savedCustomer = await storage.saveCustomer({
-        id: currentCustomer.id,
-        name: payload.name,
-        phone: payload.phone,
-        email: payload.email,
-        preferredService: payload.service,
-        notes: payload.notes,
-      });
-      setCurrentCustomer(savedCustomer);
-
-      const result = await storage.saveBooking({ ...payload, customerId: savedCustomer.id });
+      const result = await storage.saveBooking(payload);
       if (!result.ok) {
         alert('Esse horário já está ocupado. Escolha outro.');
+        await renderTimeOptions();
         return;
       }
 
       bookingForm.reset();
-      bookingNotes && (bookingNotes.value = '');
-      timeValueInput && (timeValueInput.value = '');
-      if (dateInput && dateInput._flatpickr) {
-        dateInput._flatpickr.clear();
-      } else if (dateInput) {
-        dateInput.value = '';
-      }
+      selectedBeardFinish = '';
+      renderBeardFinishOptions();
+      timeValueInput.value = '';
+      selectedTime = '';
+      dateInput.value = '';
+      renderedTimeDate = '';
       await renderTimeOptions();
-      await refreshThread(savedCustomer.phone);
+      await refreshThread(payload.phone);
+      closeWidget();
       alert('Agendamento salvo com sucesso.');
     } catch (error) {
       alert(error.message || 'Não foi possível salvar o agendamento.');
@@ -606,18 +644,45 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  serviceSelect?.addEventListener('change', renderTimeOptions);
-  dateInput?.addEventListener('change', renderTimeOptions);
+  serviceSelect?.addEventListener('change', () => {
+    selectedBeardFinish = '';
+    renderBeardFinishOptions();
+    renderTimeOptions();
+  });
+  dateInput?.addEventListener('change', () => {
+    renderTimeOptions();
+    renderDateStrip();
+  });
   bookingPhoneInput?.addEventListener('change', async () => {
     if (bookingPhoneInput.value.trim()) {
       await refreshThread(bookingPhoneInput.value.trim());
     }
   });
-  renderServiceOptions();
-  renderDateStrip();
-  sortServiceEntries();
-  renderTimeOptions();
-  renderProducts();
+  Promise.resolve(storage?.getServices ? storage.getServices() : serviceCatalog)
+    .then(() => {
+      renderServiceOptions();
+      renderDateStrip();
+      sortServiceEntries();
+      renderBeardFinishOptions();
+      const params = new URLSearchParams(window.location.search);
+      const requestedService = params.get('bookingService');
+      if (requestedService) {
+        params.delete('bookingService');
+        const remainingParams = params.toString();
+        window.history.replaceState({}, document.title, `${window.location.pathname}${remainingParams ? `?${remainingParams}` : ''}${window.location.hash}`);
+        openWidget(requestedService);
+      }
+      return Promise.all([renderTimeOptions(), renderProducts()]);
+    })
+    .catch((error) => {
+      console.error('Não foi possível carregar os serviços atualizados.', error);
+      renderServiceOptions();
+      renderDateStrip();
+      sortServiceEntries();
+      renderBeardFinishOptions();
+      renderTimeOptions();
+      renderProducts();
+    });
   const authenticatedCustomer = window.EliuzAuth?.getCustomer();
   if (authenticatedCustomer) setCurrentCustomer(authenticatedCustomer);
   if (productListSummary) {

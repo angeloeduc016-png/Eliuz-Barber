@@ -69,6 +69,7 @@
       </form>
       <div class="booking-widget-content">
         <div class="booking-date-picker" aria-label="Escolha uma data">
+          <h3>Escolha a data</h3>
           <div class="booking-date-picker-heading">
             <button type="button" class="booking-date-arrow" data-date-prev aria-label="Semana anterior">‹</button>
             <strong id="booking-month-label"></strong>
@@ -78,18 +79,28 @@
         </div>
         <section class="booking-card booking-card-only reveal is-visible">
           <span class="eyebrow">Agendamento</span>
-          <h2>Escolha o serviço e o melhor horário.</h2>
+          <h2>Escolha o dia e o horário.</h2>
           <form id="booking-form">
             <input id="booking-customer-id" type="hidden">
             <input id="booking-customer-name" type="hidden">
             <input id="booking-customer-phone" type="hidden">
-            <label>Nome para o agendamento<input id="booking-name" type="text" required placeholder="Seu nome"></label>
-            <label>Telefone<input id="booking-phone" type="tel" required placeholder="(XX) XXXXX-XXXX"></label>
-            <label>E-mail<input id="booking-email" type="email" placeholder="seuemail@exemplo.com"></label>
-            <label>Serviço<select id="service-select" required></select></label>
-            <label class="booking-date-fallback">Data<input id="booking-date" type="date" required><small id="date-help">Evite domingos e datas passadas.</small></label>
-            <label>Horário<input type="hidden" id="booking-time-value"><div id="booking-time-container" class="time-options" aria-live="polite"></div></label>
-            <label>Observações<textarea id="booking-notes" rows="3" placeholder="Alguma preferência para o atendimento?"></textarea></label>
+            <input id="booking-name" type="hidden">
+            <input id="booking-phone" type="hidden">
+            <input id="booking-email" type="hidden">
+            <select id="service-select" hidden></select>
+            <fieldset id="beard-finish-options" class="beard-finish-options" hidden>
+              <legend>Como deseja fazer a barba?</legend>
+              <div class="beard-finish-buttons">
+                <button type="button" data-beard-finish="gillette" aria-pressed="false">Gillette</button>
+                <button type="button" data-beard-finish="maquina" aria-pressed="false">Máquina</button>
+              </div>
+            </fieldset>
+            <input id="booking-date" type="hidden">
+            <input type="hidden" id="booking-time-value">
+            <div class="booking-time-picker">
+              <h3>Horários disponíveis</h3>
+              <div id="booking-time-container" class="time-options" aria-live="polite"></div>
+            </div>
             <button class="btn btn-primary" type="submit">Confirmar agendamento</button>
           </form>
         </section>

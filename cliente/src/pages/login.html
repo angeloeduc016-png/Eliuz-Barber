@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Acesse sua conta Eliuz Barber para continuar o agendamento.">
+  <meta name="eliuz-api-base" content="">
+  <link rel="icon" href="../images/favicon.ico" type="image/x-icon">
+  <title>Entrar | Eliuz Barber</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Cormorant+Garamond:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/styles.css">
+  <script src="../js/storage.js" defer></script>
+  <script src="../js/auth.js" defer></script>
+  <script src="../js/main.js" defer></script>
+</head>
+<body class="client-site">
+  <header class="site-header">
+    <div class="container nav-shell">
+      <a class="brand" href="../index.html">
+        <span class="brand-mark"><img src="../images/logo.png" alt="Barbearia Eliuz" class="brand-logo"></span>
+      </a>
+      <button class="header-theme" type="button" data-theme-toggle aria-label="Usar tema do dispositivo" title="Tema do dispositivo"><i data-lucide="sun-moon"></i></button>
+      <nav class="site-nav">
+        <a href="../index.html">Agendar</a>
+        <a href="home.html">Início</a>
+      </nav>
+    </div>
+  </header>
+  <main class="section-pad">
+    <div class="container section-heading reveal is-visible">
+      <span class="eyebrow">Área do cliente</span>
+      <h1>Entre na sua conta para agendar.</h1>
+      <p>Depois do login, você volta ao serviço escolhido e seleciona somente a data e o horário.</p>
+      <button class="btn btn-primary" type="button" data-login-open>Entrar ou criar conta</button>
+    </div>
+  </main>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelector('[data-login-open]')?.addEventListener('click', () => window.EliuzAuth?.openAccount());
+    });
+  </script>
+</body>
+</html>

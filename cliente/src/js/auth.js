@@ -198,5 +198,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
   window.EliuzAuth = { getCustomer, openAccount, requireAuth: (callback) => state.customer ? callback(state.customer) : openAccount(callback) };
   createAccountUI();
+  const loginParams = new URLSearchParams(window.location.search);
+  if (window.location.pathname.endsWith('/login.html')) {
+    const returnTo = loginParams.get('returnTo');
+    let returnUrl = null;
+    if (returnTo) {
+      try {
+        const candidate = new URL(returnTo, window.location.origin);
+        if (candidate.origin === window.location.origin) returnUrl = candidate;
+      } catch (error) {
+        console.error('Endereço de retorno do login inválido.', error);
+      }
+    }
+    openAccount(() => {
+      if (returnUrl) window.location.assign(returnUrl.href);
+    });
+  }
   restoreOAuthSession();
 });
